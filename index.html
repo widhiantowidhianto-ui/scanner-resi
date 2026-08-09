@@ -172,28 +172,619 @@ video {
       <span id="jumlah">0</span> RESI
     </div>
 
-    <label for="kameraInput" class="green tombol">
-  📷 FOTO NOMOR RESI
-</label>
+    <button
+      class="green"
+      onclick="bukaKamera()">
+      📷 BUKA KAMERA
+    </button>
 
-<input
-  id="kameraInput"
-  type="file"
-  accept="image/*"
-  capture="environment"
-  style="display:none"
-  onchange="prosesFile(event)"
->
+    <video
+      id="video"
+      autoplay
+      playsinline>
+    </video>
 
-<label for="galeriInput" class="gray tombol">
-  🖼️ PILIH FOTO DARI GALERI
-</label>
+    <button
+      class="blue"
+      onclick="ambilFoto()">
+      📸 FOTO & BACA NOMOR
+    </button>
 
-<input
-  id="galeriInput"
-  type="file"
-  accept="image/*"
-  style="display:none"
-  onchange="prosesFile(event)"
->
-   
+    <button
+      class="gray"
+      onclick="pilihFoto()">
+      🖼️ PILIH FOTO DARI GALERI
+    </button>
+
+    <input
+      id="fileFoto"
+      type="file"
+      accept="image/*"
+      style="display:none"
+      onchange="prosesFile(event)"
+    >
+
+    <canvas
+      id="canvas"
+      style="display:none">
+    </canvas>
+
+    <img
+      id="foto">
+
+    <div
+      id="status"
+      class="status">
+      Siap. Foto nomor resi untuk mulai membaca.
+    </div>
+
+    <div
+      id="hasil"
+      class="hasil"
+      style="display:none">
+
+      <b>Hasil pembacaan:</b>
+
+      <div
+        id="hasilText"
+        style="margin-top:8px">
+      </div>
+
+    </div>
+
+    <button
+      id="tambahBtn"
+      class="green"
+      style="display:none"
+      onclick="gunakanHasil()">
+
+      ✅ TAMBAHKAN NOMOR INI
+
+    </button>
+
+  </div>
+
+  <div class="card">
+
+    <b>Daftar Resi</b>
+
+    <div id="daftar"></div>
+
+  </div>
+
+  <div class="card">
+
+    <button
+      class="green"
+      onclick="kirimSemua()">
+
+      🚀 KIRIM SEMUA RESI
+
+    </button>
+
+    <button
+      class="red"
+      onclick="hapusSemua()">
+
+      🗑️ HAPUS SEMUA
+
+    </button>
+
+  </div>
+
+</div>
+
+<script>
+
+const APPS_SCRIPT_URL =
+"https://script.google.com/a/macros/spxexpress.com/s/AKfycbz5eS8WeGfnkHWeLD6AKBjdW78LIWgdH-Tzv_pvzWz9u0MexAOMEIFtfoD9A3RrI42WXw/exec";
+
+let stream = null;
+let hasilNomor = "";
+
+let resi = JSON.parse(
+  localStorage.getItem("scanner_resi") || "[]"
+);
+
+const petugas =
+  document.getElementById("petugas");
+
+petugas.value =
+  localStorage.getItem("scanner_petugas") || "";
+
+petugas.addEventListener("input", function() {
+
+  localStorage.setItem(
+    "scanner_petugas",
+    petugas.value
+  );
+
+});
+
+function tampilkan() {
+
+  document.getElementById("jumlah").innerText =
+    resi.length;
+
+  const daftar =
+    document.getElementById("daftar");
+
+  daftar.innerHTML = "";
+
+  resi.forEach(function(nomor, index) {
+
+    const div =
+      document.createElement("div");
+
+    div.className = "resi";
+
+    div.innerHTML =
+      "<span>" +
+      (index + 1) +
+      ". <b>" +
+      nomor +
+      "</b></span>" +
+
+      "<button class='red' " +
+      "onclick='hapusResi(" +
+      index +
+      ")'>HAPUS</button>";
+
+    daftar.appendChild(div);
+
+  });
+
+}
+
+function simpan() {
+
+  localStorage.setItem(
+    "scanner_resi",
+    JSON.stringify(resi)
+  );
+
+}
+
+async function bukaKamera() {
+
+  try {
+
+    if (
+      !navigator.mediaDevices ||
+      !navigator.mediaDevices.getUserMedia
+    ) {
+
+      throw new Error(
+        "Browser tidak mendukung kamera."
+      );
+
+    }
+
+    stream =
+      await navigator.mediaDevices.getUserMedia({
+
+        video: {
+          facingMode: {
+            ideal: "environment"
+          }
+        },
+
+        audio: false
+
+      });
+
+    const video =
+      document.getElementById("video");
+
+    video.srcObject = stream;
+
+    document.getElementById("status").innerText =
+      "🟢 Kamera aktif. Arahkan ke nomor resi.";
+
+  } catch(error) {
+
+    document.getElementById("status").innerText =
+      "❌ Kamera gagal: " +
+      error.name +
+      " - " +
+      error.message;
+
+  }
+
+}
+
+function ambilFoto() {
+
+  const video =
+    document.getElementById("video");
+
+  if (!stream) {
+
+    alert(
+      "Buka kamera terlebih dahulu."
+    );
+
+    return;
+
+  }
+
+  const canvas =
+    document.getElementById("canvas");
+
+  canvas.width =
+    video.videoWidth;
+
+  canvas.height =
+    video.videoHeight;
+
+  const ctx =
+    canvas.getContext("2d");
+
+  ctx.drawImage(
+    video,
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+  canvas.toBlob(
+    function(blob) {
+
+      prosesGambar(blob);
+
+    },
+    "image/jpeg",
+    0.95
+  );
+
+}
+
+function pilihFoto() {
+
+  document
+    .getElementById("fileFoto")
+    .click();
+
+}
+
+function prosesFile(event) {
+
+  const file =
+    event.target.files[0];
+
+  if (!file) return;
+
+  prosesGambar(file);
+
+}
+
+async function prosesGambar(file) {
+
+  const status =
+    document.getElementById("status");
+
+  const foto =
+    document.getElementById("foto");
+
+  const hasil =
+    document.getElementById("hasil");
+
+  const hasilText =
+    document.getElementById("hasilText");
+
+  const tambahBtn =
+    document.getElementById("tambahBtn");
+
+  hasil.style.display = "none";
+
+  tambahBtn.style.display = "none";
+
+  hasilNomor = "";
+
+  foto.src =
+    URL.createObjectURL(file);
+
+  foto.style.display = "block";
+
+  status.innerText =
+    "🔍 Sedang membaca tulisan pada foto...";
+
+  try {
+
+    const result =
+      await Tesseract.recognize(
+        file,
+        "eng",
+        {
+          logger: function(info) {
+
+            if (
+              info.status ===
+              "recognizing text"
+            ) {
+
+              const persen =
+                Math.round(
+                  info.progress * 100
+                );
+
+              status.innerText =
+                "🔍 Membaca... " +
+                persen +
+                "%";
+
+            }
+
+          }
+        }
+      );
+
+    const teks =
+      result.data.text;
+
+    console.log(teks);
+
+    hasilText.innerText =
+      teks || "Tidak ada tulisan terbaca.";
+
+    hasil.style.display =
+      "block";
+
+    const kandidat =
+      cariNomorResi(teks);
+
+    if (kandidat) {
+
+      hasilNomor = kandidat;
+
+      hasilText.innerHTML =
+        "<b>" +
+        kandidat +
+        "</b>" +
+        "<br><br>" +
+        "<small>" +
+        teks.replace(/\n/g, "<br>") +
+        "</small>";
+
+      tambahBtn.style.display =
+        "block";
+
+      status.innerText =
+        "✅ Nomor resi terdeteksi.";
+
+    } else {
+
+      status.innerText =
+        "⚠️ Tulisan terbaca, tetapi nomor resi belum terdeteksi. Periksa hasil OCR.";
+
+    }
+
+  } catch(error) {
+
+    status.innerText =
+      "❌ OCR gagal: " +
+      error.message;
+
+  }
+
+}
+
+function cariNomorResi(teks) {
+
+  if (!teks) return null;
+
+  const bersih =
+    teks
+      .toUpperCase()
+      .replace(/\s+/g, " ");
+
+  /*
+   * Mencari kandidat alfanumerik panjang.
+   * Kita sengaja tidak langsung mengambil
+   * semua tulisan pada label.
+   */
+
+  const kandidat =
+    bersih.match(
+      /\b[A-Z0-9]{10,30}\b/g
+    );
+
+  if (!kandidat) return null;
+
+  /*
+   * Buang kata-kata umum yang mungkin
+   * terbaca sebagai kandidat.
+   */
+
+  const abaikan = [
+    "INDONESIA",
+    "SHOPEE",
+    "EXPRESS",
+    "CUSTOMER",
+    "SERVICE",
+    "DELIVERY",
+    "ADDRESS",
+    "RECEIVER"
+  ];
+
+  const pilihan =
+    kandidat.filter(function(x) {
+
+      return !abaikan.includes(x);
+
+    });
+
+  if (pilihan.length === 0) {
+    return null;
+  }
+
+  /*
+   * Ambil kandidat terpanjang.
+   */
+
+  pilihan.sort(function(a, b) {
+
+    return b.length - a.length;
+
+  });
+
+  return pilihan[0];
+
+}
+
+function gunakanHasil() {
+
+  if (!hasilNomor) return;
+
+  tambahResi(hasilNomor);
+
+}
+
+function tambahResi(nomor) {
+
+  nomor =
+    String(nomor)
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, "");
+
+  if (!nomor) return;
+
+  if (resi.includes(nomor)) {
+
+    document.getElementById("status").innerText =
+      "⚠️ Resi sudah ada.";
+
+    return;
+
+  }
+
+  resi.push(nomor);
+
+  simpan();
+
+  tampilkan();
+
+  document.getElementById("status").innerText =
+    "✅ Resi ditambahkan: " +
+    nomor;
+
+}
+
+function hapusResi(index) {
+
+  resi.splice(index, 1);
+
+  simpan();
+
+  tampilkan();
+
+}
+
+function hapusSemua() {
+
+  if (!confirm(
+    "Yakin hapus semua resi?"
+  )) return;
+
+  resi = [];
+
+  simpan();
+
+  tampilkan();
+
+}
+
+async function kirimSemua() {
+
+  const nama =
+    petugas.value.trim();
+
+  if (!nama) {
+
+    alert(
+      "Masukkan nama petugas."
+    );
+
+    return;
+
+  }
+
+  if (resi.length === 0) {
+
+    alert(
+      "Belum ada resi."
+    );
+
+    return;
+
+  }
+
+  const batch =
+    nama.toUpperCase() +
+    "-" +
+    Date.now();
+
+  const data = {
+
+    petugas: nama,
+
+    batch: batch,
+
+    resi: resi
+
+  };
+
+  document.getElementById("status").innerText =
+    "⏳ Mengirim " +
+    resi.length +
+    " resi...";
+
+  try {
+
+    await fetch(
+      APPS_SCRIPT_URL,
+      {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type":
+            "text/plain;charset=utf-8"
+        },
+        body:
+          JSON.stringify(data)
+      }
+    );
+
+    alert(
+      "✅ Batch berhasil dikirim."
+    );
+
+    resi = [];
+
+    simpan();
+
+    tampilkan();
+
+    document.getElementById("status").innerText =
+      "✅ Data sudah dikirim ke pusat.";
+
+  } catch(error) {
+
+    alert(
+      "❌ Pengiriman gagal."
+    );
+
+    document.getElementById("status").innerText =
+      "❌ Gagal mengirim.";
+
+  }
+
+}
+
+tampilkan();
+
+</script>
+
+</body>
+</html>
