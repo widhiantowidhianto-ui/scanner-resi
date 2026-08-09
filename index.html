@@ -593,7 +593,8 @@
   }
 
   // Kirim data ke Google Apps Script
-  async function kirimSemua() {
+  // ✅ GANTI DENGAN KODE BARU KHUSUS AKUN SPX INI:
+  function kirimSemua() {
     const namaPetugas = elPetugas.value.trim();
 
     if (!namaPetugas) {
@@ -601,6 +602,62 @@
       elPetugas.focus();
       return;
     }
+
+    if (resi.length === 0) {
+      alert("⚠️ Belum ada resi untuk dikirim.");
+      return;
+    }
+
+    if (!confirm("🚀 Kirim " + resi.length + " resi sekarang?")) return;
+
+    const batchId = namaPetugas.toUpperCase().substring(0,3) + "-" + Date.now();
+    
+    // ⚠️ GANTI LINK DI BAWAH INI DENGAN URL APPS SCRIPT DARI AKUN WORK SPX KAMU
+    const baseUrl = "https://script.google.com/a/macros/spxexpress.com/s/AKfycbz5eS8WeGfnkHWeLD6AKBjdW78LIWgdH-Tzv_pvzWz9u0MexAOMEIFtfoD9A3RrI42WXw/exec";
+
+    // Menyiapkan parameter data
+    const params = new URLSearchParams({
+      petugas: namaPetugas,
+      batch: batchId,
+      resi: resi.join(","), // Gabungkan daftar resi dengan koma
+      callback: "handleResponse"
+    });
+
+    elStatus.innerText = "⏳ Sedang mengirim data ke Google Sheets...";
+    elStatus.style.color = "#2563eb";
+
+    // Fungsi balikan ketika Google Sheets selesai menyimpan data
+    window.handleResponse = function(response) {
+      if (response.status === "success") {
+        alert("✅ Data berhasil dikirim ke Google Sheets!");
+        resi = [];
+        simpan();
+        tampilkan();
+        elStatus.innerText = "✅ Data berhasil disimpan.";
+        elStatus.style.color = "#16a34a";
+      } else {
+        alert("❌ Gagal menyimpan: " + response.message);
+        elStatus.innerText = "❌ Terjadi kesalahan.";
+        elStatus.style.color = "#dc2626";
+      }
+      
+      // Bersihkan script dinamis setelah selesai
+      const scriptEl = document.getElementById("jsonp-script");
+      if (scriptEl) scriptEl.remove();
+    };
+
+    // Teknik JSONP: Membuat elemen script dinamis untuk tembus blokir akun kantor
+    const script = document.createElement("script");
+    script.id = "jsonp-script";
+    script.src = baseUrl + "?" + params.toString();
+    script.onerror = function() {
+      alert("❌ Gagal terhubung ke Google Sheets. Pastikan URL Apps Script benar dan Deployment diatur ke 'Anyone'.");
+      elStatus.innerText = "❌ Pengiriman gagal.";
+      elStatus.style.color = "#dc2626";
+    };
+    
+    document.body.appendChild(script);
+  }
 
     if (resi.length === 0) {
       alert("⚠️ Belum ada resi untuk dikirim.");
