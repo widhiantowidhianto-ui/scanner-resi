@@ -174,21 +174,8 @@ video {
 
     <button
   type="button"
-  onclick="document.getElementById('kameraInput').click()"
-  style="
-    display:block;
-    width:100%;
-    box-sizing:border-box;
-    padding:20px 12px;
-    margin-top:10px;
-    border:none;
-    border-radius:12px;
-    background:#16a34a;
-    color:white;
-    font-size:20px;
-    font-weight:bold;
-    cursor:pointer;
-  ">
+  class="green"
+  onclick="document.getElementById('kameraInput').click()">
   📷 FOTO NOMOR RESI
 </button>
 
@@ -203,21 +190,8 @@ video {
 
 <button
   type="button"
-  onclick="document.getElementById('galeriInput').click()"
-  style="
-    display:block;
-    width:100%;
-    box-sizing:border-box;
-    padding:20px 12px;
-    margin-top:10px;
-    border:none;
-    border-radius:12px;
-    background:#e5e7eb;
-    color:#222;
-    font-size:20px;
-    font-weight:bold;
-    cursor:pointer;
-  ">
+  class="gray"
+  onclick="document.getElementById('galeriInput').click()">
   🖼️ PILIH FOTO DARI GALERI
 </button>
 
@@ -227,6 +201,7 @@ video {
   accept="image/*"
   style="display:none"
   onchange="prosesFile(event)"
+>
 >
 >
     >
