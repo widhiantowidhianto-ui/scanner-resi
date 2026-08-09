@@ -313,12 +313,26 @@
     </div>
   </div>
 
-  <!-- Input Manual Resi -->
+  <!-- Input Manual Resi (Versi Diperkuat) -->
   <div class="card">
     <div class="card-title">⌨️ INPUT RESI MANUAL</div>
     <div class="input-manual-bar">
-      <input id="manualResi" type="text" placeholder="SPXID068255909326" onkeypress="handleKeyPress(event)">
-      <button type="button" class="btn-action" onclick="tambahManual()">+ Tambah</button>
+      <input 
+        id="manualResi" 
+        type="text" 
+        placeholder="Contoh: SPXID068255909326"
+        autocomplete="off"
+        autocorrect="off"
+        capitalize="characters"
+      >
+      <button 
+        id="btnTambahManual"
+        type="button" 
+        class="btn-action" 
+        style="min-width: 100px; cursor: pointer;"
+      >
+        + Tambah
+      </button>
     </div>
   </div>
 
@@ -590,6 +604,45 @@
     
     document.body.appendChild(script);
   }
+
+  // ==========================================
+  // EVENT LISTENER INPUT MANUAL (TEMPATKAN DI SINI)
+  // ==========================================
+  const elInputManual = document.getElementById("manualResi");
+  const elBtnTambahManual = document.getElementById("btnTambahManual");
+
+  function eksekusiTambahManual() {
+    if (!elInputManual) return;
+    
+    const nilai = elInputManual.value.trim();
+    
+    if (nilai.length > 0) {
+      tambahResi(nilai);
+      elInputManual.value = ""; // Bersihkan teks setelah ditambah
+      elInputManual.focus();    // Kembalikan kursor ke input
+    } else {
+      alert("⚠️ Silakan ketik nomor resi terlebih dahulu.");
+    }
+  }
+
+  // Event 1: Ketika Tombol "+ Tambah" Diklik
+  if (elBtnTambahManual) {
+    elBtnTambahManual.addEventListener("click", function(e) {
+      e.preventDefault();
+      eksekusiTambahManual();
+    });
+  }
+
+  // Event 2: Ketika Menekan Tombol 'Enter' di Keyboard
+  if (elInputManual) {
+    elInputManual.addEventListener("keydown", function(e) {
+      if (e.key === "Enter" || e.keyCode === 13) {
+        e.preventDefault();
+        eksekusiTambahManual();
+      }
+    });
+  }
+  // ==========================================
 
   // Load Awal
   tampilkan();
