@@ -172,9 +172,25 @@ video {
       <span id="jumlah">0</span> RESI
     </div>
 
-    <label for="kameraInput" class="green tombol">
+    <button
+  type="button"
+  onclick="document.getElementById('kameraInput').click()"
+  style="
+    display:block;
+    width:100%;
+    box-sizing:border-box;
+    padding:20px 12px;
+    margin-top:10px;
+    border:none;
+    border-radius:12px;
+    background:#16a34a;
+    color:white;
+    font-size:20px;
+    font-weight:bold;
+    cursor:pointer;
+  ">
   📷 FOTO NOMOR RESI
-</label>
+</button>
 
 <input
   id="kameraInput"
@@ -185,9 +201,25 @@ video {
   onchange="prosesFile(event)"
 >
 
-<label for="galeriInput" class="gray tombol">
+<button
+  type="button"
+  onclick="document.getElementById('galeriInput').click()"
+  style="
+    display:block;
+    width:100%;
+    box-sizing:border-box;
+    padding:20px 12px;
+    margin-top:10px;
+    border:none;
+    border-radius:12px;
+    background:#e5e7eb;
+    color:#222;
+    font-size:20px;
+    font-weight:bold;
+    cursor:pointer;
+  ">
   🖼️ PILIH FOTO DARI GALERI
-</label>
+</button>
 
 <input
   id="galeriInput"
@@ -195,6 +227,7 @@ video {
   accept="image/*"
   style="display:none"
   onchange="prosesFile(event)"
+>
 >
     >
 
