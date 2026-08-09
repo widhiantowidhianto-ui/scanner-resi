@@ -143,7 +143,17 @@ video {
   font-size: 13px;
   margin-top: 8px;
 }
-</style>
+</style>.tombol {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
 </head>
 
 <body>
@@ -172,34 +182,28 @@ video {
       <span id="jumlah">0</span> RESI
     </div>
 
-    <button
-      class="green"
-      onclick="bukaKamera()">
-      📷 BUKA KAMERA
-    </button>
+    <label for="kameraInput" class="green tombol">
+  📷 FOTO NOMOR RESI
+</label>
 
-    <video
-      id="video"
-      autoplay
-      playsinline>
-    </video>
+<input
+  id="kameraInput"
+  type="file"
+  accept="image/*"
+  capture="environment"
+  style="display:none"
+  onchange="prosesFile(event)"
+>
 
-    <button
-      class="blue"
-      onclick="ambilFoto()">
-      📸 FOTO & BACA NOMOR
-    </button>
+<label for="galeriInput" class="gray tombol">
+  🖼️ PILIH FOTO DARI GALERI
+</label>
 
-    <button
-      class="gray"
-      onclick="pilihFoto()">
-      🖼️ PILIH FOTO DARI GALERI
-    </button>
-
-    <input
-      id="fileFoto"
-      type="file"
-      accept="image/*"
-      style="display:none"
-      onchange="prosesFile(event)"
+<input
+  id="galeriInput"
+  type="file"
+  accept="image/*"
+  style="display:none"
+  onchange="prosesFile(event)"
+>
    
