@@ -404,4 +404,204 @@
       tampilkan();
       
       elStatus.innerText = "✅ Resi " + nomor + " berhasil ditambahkan.";
-      elStatus.className = "glass-card rounded
+      elStatus.className = "glass-card rounded-2xl p-4 text-center text-xs sm:text-sm font-bold text-emerald-400 border border-emerald-500/40 w-full";
+    }
+
+    function gunakanHasil() {
+      if (!hasilNomor) return;
+      tambahResi(hasilNomor);
+      
+      elHasilContainer.classList.add("hidden");
+      elTambahBtn.style.display = "none";
+      elFoto.classList.add("hidden");
+      elStatus.innerText = "Siap untuk scan berikutnya.";
+      elStatus.className = "glass-card rounded-2xl p-4 text-center text-xs sm:text-sm font-bold text-gray-300 border border-slate-700/60 w-full";
+    }
+
+    function prosesFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      prosesGambar(file);
+      event.target.value = "";
+    }
+
+    async function prosesGambar(file) {
+      elHasilContainer.classList.add("hidden");
+      elTambahBtn.style.display = "none";
+      hasilNomor = "";
+
+      elFoto.src = URL.createObjectURL(file);
+      elFoto.classList.remove("hidden");
+
+      elStatus.innerText = "🔍 Sedang membaca tulisan...";
+      elStatus.className = "glass-card rounded-2xl p-4 text-center text-xs sm:text-sm font-bold text-blue-400 border border-blue-500/40 w-full";
+
+      try {
+        const result = await Tesseract.recognize(file, "eng", {
+          logger: function(info) {
+            if (info.status === "recognizing text") {
+              const persen = Math.round(info.progress * 100);
+              elStatus.innerText = "⏳ Membaca... (" + persen + "%)";
+            }
+          }
+        });
+
+        const teksMentah = result.data.text;
+        elHasilContainer.classList.remove("hidden");
+
+        const kandidat = cariNomorResi(teksMentah);
+
+        if (kandidat) {
+          hasilNomor = kandidat;
+          elHasilText.innerHTML = `
+            <div class="text-xl font-black text-red-400">${kandidat}</div>
+            <div class="text-xs text-emerald-400 font-bold my-1"><i class="fa-solid fa-circle-check"></i> Nomor resi berhasil terdeteksi.</div>
+            <span class="raw-text">${teksMentah.replace(/\n/g, "<br>")}</span>
+          `;
+          elTambahBtn.style.display = "flex";
+          elStatus.innerText = "✅ Nomor resi berhasil terdeteksi.";
+          elStatus.className = "glass-card rounded-2xl p-4 text-center text-xs sm:text-sm font-bold text-emerald-400 border border-emerald-500/40 w-full";
+        } else {
+          elHasilText.innerHTML = `
+            <span class="text-xs text-red-400 font-bold">Nomor resi tidak terdeteksi otomatis.</span>
+            <span class="raw-text">${teksMentah.replace(/\n/g, "<br>")}</span>
+          `;
+          elStatus.innerText = "⚠️ Teks terbaca, tapi format resi tidak cocok.";
+          elStatus.className = "glass-card rounded-2xl p-4 text-center text-xs sm:text-sm font-bold text-amber-400 border border-amber-500/40 w-full";
+        }
+
+      } catch(error) {
+        elStatus.innerText = "❌ Gagal membaca gambar: " + error.message;
+        elStatus.className = "glass-card rounded-2xl p-4 text-center text-xs sm:text-sm font-bold text-red-400 border border-red-500/40 w-full";
+      }
+    }
+
+    function cariNomorResi(teks) {
+      if (!teks) return null;
+      let t = teks.toUpperCase().replace(/\|/g, "I").replace(/\n+/g, " ").replace(/\s+/g, " ").trim();
+
+      let match = t.match(/S\s*P\s*X\s*I\s*D\s*[-: ]*\s*(\d{10,20})/i);
+      if (match) return "SPXID" + match[1];
+
+      match = t.match(/SPX\s*ID\s*[-: ]*\s*(\d{10,20})/i);
+      if (match) return "SPXID" + match[1];
+
+      match = t.match(/SPXID[^0-9]{0,10}(\d{10,20})/i);
+      if (match) return "SPXID" + match[1];
+
+      return null;
+    }
+
+    function hapusResi(index) {
+      if (confirm("Hapus resi " + resi[index] + "?")) {
+        resi.splice(index, 1);
+        simpan();
+        tampilkan();
+      }
+    }
+
+    function hapusSemua() {
+      if (resi.length === 0) return;
+      if (!confirm("⚠️ Yakin ingin menghapus SEMUA resi?")) return;
+      resi = [];
+      simpan();
+      tampilkan();
+      elStatus.innerText = "Daftar resi telah dibersihkan.";
+      elStatus.className = "glass-card rounded-2xl p-4 text-center text-xs sm:text-sm font-bold text-gray-300 border border-slate-700/60 w-full";
+    }
+
+    function kirimSemua() {
+      const namaPetugas = elPetugas.value.trim();
+
+      if (!namaPetugas) {
+        alert("⚠️ Harap masukkan Nama Petugas terlebih dahulu.");
+        elPetugas.focus();
+        return;
+      }
+
+      if (resi.length === 0) {
+        alert("⚠️ Belum ada resi untuk dikirim.");
+        return;
+      }
+
+      if (!confirm("🚀 Kirim " + resi.length + " resi sekarang?")) return;
+
+      const batchId = namaPetugas.toUpperCase().substring(0,3) + "-" + Date.now();
+      
+      const params = new URLSearchParams({
+        petugas: namaPetugas,
+        batch: batchId,
+        resi: resi.join(","),
+        callback: "handleResponse"
+      });
+
+      elStatus.innerText = "⏳ Sedang mengirim data ke Google Sheets...";
+      elStatus.className = "glass-card rounded-2xl p-4 text-center text-xs sm:text-sm font-bold text-blue-400 border border-blue-500/40 w-full";
+
+      window.handleResponse = function(response) {
+        if (response.status === "success") {
+          alert("✅ Data berhasil dikirim ke Google Sheets!");
+          resi = [];
+          simpan();
+          tampilkan();
+          elStatus.innerText = "✅ Data berhasil disimpan.";
+          elStatus.className = "glass-card rounded-2xl p-4 text-center text-xs sm:text-sm font-bold text-emerald-400 border border-emerald-500/40 w-full";
+        } else {
+          alert("❌ Gagal menyimpan: " + response.message);
+          elStatus.innerText = "❌ Terjadi kesalahan.";
+          elStatus.className = "glass-card rounded-2xl p-4 text-center text-xs sm:text-sm font-bold text-red-400 border border-red-500/40 w-full";
+        }
+        
+        const scriptEl = document.getElementById("jsonp-script");
+        if (scriptEl) scriptEl.remove();
+      };
+
+      const script = document.createElement("script");
+      script.id = "jsonp-script";
+      script.src = APPS_SCRIPT_URL + "?" + params.toString();
+      script.onerror = function() {
+        alert("❌ Gagal terhubung ke Google Sheets. Cek koneksi internet atau URL Apps Script.");
+        elStatus.innerText = "❌ Pengiriman gagal.";
+        elStatus.className = "glass-card rounded-2xl p-4 text-center text-xs sm:text-sm font-bold text-red-400 border border-red-500/40 w-full";
+      };
+      
+      document.body.appendChild(script);
+    }
+
+    const elInputManual = document.getElementById("manualResi");
+    const elBtnTambahManual = document.getElementById("btnTambahManual");
+
+    function eksekusiTambahManual() {
+      if (!elInputManual) return;
+      
+      const nilai = elInputManual.value.trim();
+      
+      if (nilai.length > 0) {
+        tambahResi(nilai);
+        elInputManual.value = ""; 
+        elInputManual.focus();    
+      } else {
+        alert("⚠️ Silakan ketik nomor resi terlebih dahulu.");
+      }
+    }
+
+    if (elBtnTambahManual) {
+      elBtnTambahManual.addEventListener("click", function(e) {
+        e.preventDefault();
+        eksekusiTambahManual();
+      });
+    }
+
+    if (elInputManual) {
+      elInputManual.addEventListener("keydown", function(e) {
+        if (e.key === "Enter" || e.keyCode === 13) {
+          e.preventDefault();
+          eksekusiTambahManual();
+        }
+      });
+    }
+
+    tampilkan();
+  </script>
+</body>
+</html>
