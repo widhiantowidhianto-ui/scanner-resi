@@ -13,7 +13,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
-    /* Background Cyberpunk Red Glow Modern */
     html, body {
       width: 100%;
       min-height: 100vh;
@@ -23,7 +22,6 @@
     }
 
     body {
-      /* Dynamic Radial Mesh Background */
       background-image: 
         radial-gradient(circle at 15% 15%, rgba(239, 68, 68, 0.25) 0%, transparent 40%),
         radial-gradient(circle at 85% 30%, rgba(220, 38, 38, 0.2) 0%, transparent 45%),
@@ -35,7 +33,6 @@
       color: #f1f5f9;
     }
 
-    /* Glassmorphic Container & Glowing Neon Effects */
     .glass-card {
       background: rgba(18, 24, 38, 0.75);
       backdrop-filter: blur(20px);
@@ -71,13 +68,10 @@
 </head>
 <body class="pb-28 pt-4 px-4 sm:px-8 lg:px-12">
 
-  <!-- Container Full Width Lebar Otomatis -->
   <div class="w-full">
-
     <!-- ================= HEADER SECTION ================= -->
     <header class="text-white mb-6 glass-card-header p-5 sm:p-6 rounded-3xl w-full">
       <div class="flex flex-wrap justify-between items-center gap-4">
-        <!-- Logo SPX Express & Title -->
         <div class="flex items-center gap-3.5">
           <div class="bg-red-600/20 p-3 rounded-2xl border border-red-500/40 backdrop-blur-md shadow-[0_0_15px_rgba(239,68,68,0.3)]">
             <span class="text-3xl sm:text-4xl font-black italic tracking-tighter text-white">SPX</span>
@@ -91,7 +85,6 @@
           </div>
         </div>
 
-        <!-- Banner Dirgahayu RI & Location -->
         <div class="flex items-center gap-6">
           <div class="hidden sm:inline-flex items-center gap-2.5 bg-white/5 backdrop-blur-md px-4 py-2 rounded-full text-xs sm:text-sm font-semibold border border-white/10 text-red-400">
             <i class="fa-solid fa-location-dot"></i>
@@ -107,13 +100,13 @@
       </div>
     </header>
 
-    <!-- ================= MAIN CONTENT (FULL-WIDTH GRID 2 KOLOM) ================= -->
+    <!-- ================= MAIN CONTENT ================= -->
     <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 w-full">
 
-      <!-- ================= KOLOM KIRI (ACTION & SCANNER) ================= -->
+      <!-- KOLOM KIRI -->
       <div class="lg:col-span-7 md:col-span-1 space-y-5">
 
-        <!-- 1. Identitas Petugas -->
+        <!-- Identitas Petugas -->
         <div class="glass-card rounded-2xl p-5 w-full">
           <label class="text-xs sm:text-sm font-bold text-red-400 uppercase flex items-center gap-2 mb-2.5 tracking-wider" for="petugas">
             <span class="w-6 h-6 rounded-full bg-red-600/30 text-red-400 flex items-center justify-center text-xs border border-red-500/40">
@@ -127,7 +120,7 @@
           </div>
         </div>
 
-        <!-- 2. Ringkasan Resi Terrekam -->
+        <!-- Ringkasan -->
         <div class="glass-card rounded-2xl p-5 flex items-center justify-between w-full">
           <div class="bg-gradient-to-br from-red-600 to-red-900 text-white rounded-xl p-4 text-center w-28 flex flex-col items-center justify-center shadow-[0_0_15px_rgba(220,38,38,0.3)]">
             <i class="fa-solid fa-chart-column text-2xl mb-1 text-amber-300"></i>
@@ -147,7 +140,7 @@
           </div>
         </div>
 
-        <!-- 3. Tombol Kamera & Galeri -->
+        <!-- Tombol Kamera & Galeri -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
           <label for="kameraInput" class="bg-gradient-to-r from-red-600 to-red-700 text-white p-4 rounded-2xl glass-card neon-border-red flex items-center justify-between cursor-pointer active:scale-95 hover:brightness-110 transition">
             <div class="flex items-center gap-3.5">
@@ -178,8 +171,9 @@
           <input id="galeriInput" type="file" accept="image/*" style="display:none" onchange="prosesFile(event)">
         </div>
 
-        <!-- Preview Foto -->
+        <!-- Preview Foto & Canvas Tersembunyi -->
         <img id="foto" alt="Preview Resi" class="w-full max-h-80 object-contain rounded-2xl border-2 border-dashed border-red-500/30 hidden bg-slate-900/90 p-2">
+        <canvas id="procCanvas" class="hidden"></canvas>
 
         <!-- Status Bar -->
         <div id="status" class="glass-card rounded-2xl p-4 text-center text-xs sm:text-sm font-bold text-gray-300 border border-slate-700/60 w-full">
@@ -214,10 +208,10 @@
 
       </div>
 
-      <!-- ================= KOLOM KANAN (INPUT MANUAL & LIST) ================= -->
+      <!-- KOLOM KANAN -->
       <div class="lg:col-span-5 md:col-span-1 space-y-5">
 
-        <!-- 4. Form Input Manual -->
+        <!-- Form Input Manual -->
         <div class="glass-card rounded-2xl p-5 w-full">
           <label class="text-xs sm:text-sm font-bold text-gray-300 uppercase flex items-center gap-2 mb-2.5 tracking-wider">
             <i class="fa-regular fa-keyboard text-red-400 text-base"></i>
@@ -244,7 +238,7 @@
           </div>
         </div>
 
-        <!-- 5. Daftar Resi & Action -->
+        <!-- Daftar Resi -->
         <div class="glass-card rounded-2xl p-5 w-full">
           <div class="flex justify-between items-center mb-3 pb-2.5 border-b border-slate-700/80">
             <span class="text-xs sm:text-sm font-bold text-gray-300 uppercase flex items-center gap-2 tracking-wider">
@@ -263,7 +257,7 @@
           </button>
         </div>
 
-        <!-- 6. Footer Stats Badge -->
+        <!-- Footer Stats Badge -->
         <div class="glass-card rounded-2xl p-4 grid grid-cols-3 divide-x divide-slate-800 text-center w-full">
           <div class="px-2 flex flex-col items-center">
             <div class="flex items-center gap-1 text-red-400 text-xs font-bold mb-1">
@@ -293,7 +287,7 @@
     </main>
   </div>
 
-  <!-- ================= BOTTOM NAVIGATION BAR ================= -->
+  <!-- BOTTOM NAVIGATION BAR -->
   <nav class="fixed bottom-0 left-0 right-0 bg-slate-950/90 backdrop-blur-lg border-t border-slate-800 px-4 py-2.5 z-50 shadow-2xl">
     <div class="max-w-xl mx-auto flex justify-between items-center relative">
       <a href="#" class="flex flex-col items-center text-red-500 w-12">
@@ -325,7 +319,7 @@
     </div>
   </nav>
 
-  <!-- ================= SCRIPT LOGIC (NATIVE JAVASCRIPT UTUH) ================= -->
+  <!-- ================= SCRIPT LOGIC PERBAIKAN ================= -->
   <script>
     const APPS_SCRIPT_URL = "https://script.google.com/a/macros/spxexpress.com/s/AKfycbyES7UK3oV0nDdccdfp3Rl0nj3IVmb4gY0zbT9aL2ijsD8rLAOHtrGcZOyP3gYdTllC2w/exec";
 
@@ -334,6 +328,7 @@
 
     const elStatus = document.getElementById("status");
     const elFoto = document.getElementById("foto");
+    const elCanvas = document.getElementById("procCanvas");
     const elHasilContainer = document.getElementById("hasil");
     const elHasilText = document.getElementById("hasilText");
     const elTambahBtn = document.getElementById("tambahBtn");
@@ -375,20 +370,6 @@
       localStorage.setItem("scanner_resi", JSON.stringify(resi));
     }
 
-    function tambahManual() {
-      const elInput = document.getElementById("manualResi");
-      if (!elInput) return;
-      
-      const nilai = elInput.value.trim();
-      if (nilai !== "") {
-        tambahResi(nilai);
-        elInput.value = ""; 
-        elInput.focus();
-      } else {
-        alert("Masukkan nomor resi terlebih dahulu.");
-      }
-    }
-
     function tambahResi(nomor) {
       nomor = String(nomor).toUpperCase().replace(/[^A-Z0-9]/g, "");
 
@@ -421,59 +402,86 @@
     function prosesFile(event) {
       const file = event.target.files[0];
       if (!file) return;
-      prosesGambar(file);
-      event.target.value = "";
-    }
 
-    async function prosesGambar(file) {
       elHasilContainer.classList.add("hidden");
       elTambahBtn.style.display = "none";
       hasilNomor = "";
 
-      elFoto.src = URL.createObjectURL(file);
-      elFoto.classList.remove("hidden");
-
-      elStatus.innerText = "🔍 Sedang membaca tulisan...";
+      elStatus.innerText = "⏳ Membaca file gambar...";
       elStatus.className = "glass-card rounded-2xl p-4 text-center text-xs sm:text-sm font-bold text-blue-400 border border-blue-500/40 w-full";
 
-      try {
-        const result = await Tesseract.recognize(file, "eng", {
-          logger: function(info) {
-            if (info.status === "recognizing text") {
-              const persen = Math.round(info.progress * 100);
-              elStatus.innerText = "⏳ Membaca... (" + persen + "%)";
-            }
-          }
-        });
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64Img = e.target.result;
+        elFoto.src = base64Img;
+        elFoto.classList.remove("hidden");
 
-        const teksMentah = result.data.text;
-        elHasilContainer.classList.remove("hidden");
+        // Proses OCR menggunakan Image Element untuk menghindari Error Code=0
+        prosesOcrBase64(base64Img);
+      };
 
-        const kandidat = cariNomorResi(teksMentah);
-
-        if (kandidat) {
-          hasilNomor = kandidat;
-          elHasilText.innerHTML = `
-            <div class="text-xl font-black text-red-400">${kandidat}</div>
-            <div class="text-xs text-emerald-400 font-bold my-1"><i class="fa-solid fa-circle-check"></i> Nomor resi berhasil terdeteksi.</div>
-            <span class="raw-text">${teksMentah.replace(/\n/g, "<br>")}</span>
-          `;
-          elTambahBtn.style.display = "flex";
-          elStatus.innerText = "✅ Nomor resi berhasil terdeteksi.";
-          elStatus.className = "glass-card rounded-2xl p-4 text-center text-xs sm:text-sm font-bold text-emerald-400 border border-emerald-500/40 w-full";
-        } else {
-          elHasilText.innerHTML = `
-            <span class="text-xs text-red-400 font-bold">Nomor resi tidak terdeteksi otomatis.</span>
-            <span class="raw-text">${teksMentah.replace(/\n/g, "<br>")}</span>
-          `;
-          elStatus.innerText = "⚠️ Teks terbaca, tapi format resi tidak cocok.";
-          elStatus.className = "glass-card rounded-2xl p-4 text-center text-xs sm:text-sm font-bold text-amber-400 border border-amber-500/40 w-full";
-        }
-
-      } catch(error) {
-        elStatus.innerText = "❌ Gagal membaca gambar: " + error.message;
+      reader.onerror = function() {
+        elStatus.innerText = "❌ Gagal membaca file gambar lokal.";
         elStatus.className = "glass-card rounded-2xl p-4 text-center text-xs sm:text-sm font-bold text-red-400 border border-red-500/40 w-full";
-      }
+      };
+
+      reader.readAsDataURL(file);
+      event.target.value = "";
+    }
+
+    function prosesOcrBase64(dataUrl) {
+      const img = new Image();
+      img.onload = async function() {
+        // Konversi dan optimasi gambar melalui Canvas
+        const ctx = elCanvas.getContext("2d");
+        elCanvas.width = img.width;
+        elCanvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+
+        // Render Canvas ke DataURL bersih
+        const cleanDataUrl = elCanvas.toDataURL("image/jpeg", 0.9);
+
+        try {
+          const result = await Tesseract.recognize(cleanDataUrl, "eng", {
+            logger: function(info) {
+              if (info.status === "recognizing text") {
+                const persen = Math.round(info.progress * 100);
+                elStatus.innerText = "⏳ Membaca Teks OCR... (" + persen + "%)";
+              }
+            }
+          });
+
+          const teksMentah = result.data.text;
+          elHasilContainer.classList.remove("hidden");
+
+          const kandidat = cariNomorResi(teksMentah);
+
+          if (kandidat) {
+            hasilNomor = kandidat;
+            elHasilText.innerHTML = `
+              <div class="text-xl font-black text-red-400">${kandidat}</div>
+              <div class="text-xs text-emerald-400 font-bold my-1"><i class="fa-solid fa-circle-check"></i> Nomor resi berhasil terdeteksi.</div>
+              <span class="raw-text">${teksMentah.replace(/\n/g, "<br>")}</span>
+            `;
+            elTambahBtn.style.display = "flex";
+            elStatus.innerText = "✅ Nomor resi berhasil terdeteksi.";
+            elStatus.className = "glass-card rounded-2xl p-4 text-center text-xs sm:text-sm font-bold text-emerald-400 border border-emerald-500/40 w-full";
+          } else {
+            elHasilText.innerHTML = `
+              <span class="text-xs text-red-400 font-bold">Nomor resi tidak terdeteksi otomatis.</span>
+              <span class="raw-text">${teksMentah.replace(/\n/g, "<br>")}</span>
+            `;
+            elStatus.innerText = "⚠️ Teks terbaca, tapi format resi tidak cocok.";
+            elStatus.className = "glass-card rounded-2xl p-4 text-center text-xs sm:text-sm font-bold text-amber-400 border border-amber-500/40 w-full";
+          }
+
+        } catch(error) {
+          elStatus.innerText = "❌ Gagal membaca gambar: " + error.message;
+          elStatus.className = "glass-card rounded-2xl p-4 text-center text-xs sm:text-sm font-bold text-red-400 border border-red-500/40 w-full";
+        }
+      };
+
+      img.src = dataUrl;
     }
 
     function cariNomorResi(teks) {
