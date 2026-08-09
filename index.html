@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>SPX Express - Scanner Resi OCR Pro</title>
 
   <!-- Library Tesseract OCR -->
@@ -13,175 +13,199 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
-    /* Background Modern Gradient Keren dengan Motif Wave & Red Glow */
+    /* Background Cyberpunk Red Glow Modern */
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      background-color: #0b0f19;
+    }
+
     body {
-      background: radial-gradient(circle at 50% -20%, #ef4444, #991b1b, #1e1b4b);
+      /* Dynamic Radial Mesh Background */
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(239, 68, 68, 0.25) 0%, transparent 40%),
+        radial-gradient(circle at 85% 30%, rgba(220, 38, 38, 0.2) 0%, transparent 45%),
+        radial-gradient(circle at 50% 85%, rgba(185, 28, 28, 0.25) 0%, transparent 50%),
+        radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 0);
+      background-size: 100% 100%, 100% 100%, 100% 100%, 24px 24px;
       background-attachment: fixed;
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      min-height: 100vh;
-      color: #0f172a;
+      color: #f1f5f9;
     }
 
-    /* Efek Glassmorphism & Shadow Premium */
-    .glass-header {
-      background: rgba(185, 28, 28, 0.45);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    /* Glassmorphic Container & Glowing Neon Effects */
+    .glass-card {
+      background: rgba(18, 24, 38, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
     }
 
-    .card-shadow {
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    .glass-card-header {
+      background: linear-gradient(135deg, rgba(220, 38, 38, 0.3) 0%, rgba(15, 23, 42, 0.8) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      box-shadow: 0 0 25px rgba(220, 38, 38, 0.15);
+    }
+
+    .neon-border-red {
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
     }
 
     .raw-text {
-      color: #64748b;
+      color: #94a3b8;
       font-size: 11px;
       max-height: 80px;
       overflow-y: auto;
       display: block;
       margin-top: 8px;
       padding-top: 8px;
-      border-top: 1px solid #e2e8f0;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
       text-align: left;
     }
   </style>
 </head>
-<body class="pb-24 pt-4">
+<body class="pb-28 pt-4 px-4 sm:px-8 lg:px-12">
 
-  <!-- Main Container Full Responsive Pas Layar -->
-  <div class="max-w-6xl mx-auto px-4 md:px-6">
+  <!-- Container Full Width Lebar Otomatis -->
+  <div class="w-full">
 
     <!-- ================= HEADER SECTION ================= -->
-    <header class="text-white mb-6 glass-header p-4 sm:p-6 rounded-3xl border border-white/20 card-shadow">
+    <header class="text-white mb-6 glass-card-header p-5 sm:p-6 rounded-3xl w-full">
       <div class="flex flex-wrap justify-between items-center gap-4">
         <!-- Logo SPX Express & Title -->
-        <div class="flex items-center gap-3">
-          <div class="bg-white/10 p-2.5 rounded-2xl border border-white/20 backdrop-blur-md">
-            <span class="text-3xl sm:text-4xl font-extrabold italic tracking-tighter text-white">SPX</span>
-            <span class="text-[10px] sm:text-xs font-bold uppercase bg-red-600 px-1.5 py-0.5 rounded text-white ml-1">EXPRESS</span>
+        <div class="flex items-center gap-3.5">
+          <div class="bg-red-600/20 p-3 rounded-2xl border border-red-500/40 backdrop-blur-md shadow-[0_0_15px_rgba(239,68,68,0.3)]">
+            <span class="text-3xl sm:text-4xl font-black italic tracking-tighter text-white">SPX</span>
+            <span class="text-[10px] sm:text-xs font-bold uppercase bg-red-600 px-2 py-0.5 rounded text-white ml-1">EXPRESS</span>
           </div>
           <div>
-            <p class="text-base sm:text-lg font-bold text-white tracking-wide">Scanner Resi OCR <span class="bg-amber-400 text-red-950 font-black px-1.5 py-0.5 rounded text-xs">Pro</span></p>
-            <p class="text-xs text-red-200">Scan • Deteksi Otomatis • Simpan ke Database</p>
+            <p class="text-lg sm:text-2xl font-black text-white tracking-wide flex items-center gap-2">
+              Scanner Resi OCR <span class="bg-gradient-to-r from-amber-400 to-amber-500 text-black font-extrabold px-2 py-0.5 rounded-md text-xs shadow-md">Pro v2</span>
+            </p>
+            <p class="text-xs sm:text-sm text-gray-300">Scan • Deteksi Otomatis • Sync Database Realtime</p>
           </div>
         </div>
 
         <!-- Banner Dirgahayu RI & Location -->
-        <div class="flex items-center gap-4">
-          <div class="hidden sm:inline-flex items-center gap-2 bg-black/20 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-semibold border border-white/10">
-            <i class="fa-solid fa-location-dot text-red-400"></i>
-            <span>TANJUNGANOM 2 HUB</span>
+        <div class="flex items-center gap-6">
+          <div class="hidden sm:inline-flex items-center gap-2.5 bg-white/5 backdrop-blur-md px-4 py-2 rounded-full text-xs sm:text-sm font-semibold border border-white/10 text-red-400">
+            <i class="fa-solid fa-location-dot"></i>
+            <span class="text-white">TANJUNGANOM 2 HUB</span>
           </div>
 
-          <div class="text-right border-l border-white/20 pl-4">
-            <p class="text-[9px] uppercase tracking-widest font-semibold text-red-200">DIRGAHAYU REPUBLIK INDONESIA</p>
-            <div class="text-2xl sm:text-3xl font-black leading-none text-amber-300">81<span class="text-xs font-medium text-white">TH</span></div>
-            <p class="text-[8px] text-red-100">TERUS MELAJU UNTUK INDONESIA MAJU</p>
+          <div class="text-right border-l border-white/10 pl-4 sm:pl-6">
+            <p class="text-[10px] uppercase tracking-widest font-bold text-red-400">DIRGAHAYU REPUBLIK INDONESIA</p>
+            <div class="text-3xl sm:text-4xl font-black leading-none text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]">81<span class="text-xs font-medium text-white">TH</span></div>
+            <p class="text-[9px] text-gray-300">TERUS MELAJU UNTUK INDONESIA MAJU</p>
           </div>
         </div>
       </div>
     </header>
 
-    <!-- ================= MAIN CONTENT (LAYOUT GRID 2 KOLOM PADA TABLET/PC) ================= -->
-    <main class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+    <!-- ================= MAIN CONTENT (FULL-WIDTH GRID 2 KOLOM) ================= -->
+    <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 w-full">
 
-      <!-- ================= KOLOM KIRI (AKSI UTAMA & SCANNER) ================= -->
-      <div class="lg:col-span-7 space-y-4">
+      <!-- ================= KOLOM KIRI (ACTION & SCANNER) ================= -->
+      <div class="lg:col-span-7 md:col-span-1 space-y-5">
 
         <!-- 1. Identitas Petugas -->
-        <div class="bg-white/95 backdrop-blur-md rounded-2xl p-4 card-shadow border border-white/50">
-          <label class="text-xs font-black text-gray-700 uppercase flex items-center gap-2 mb-2" for="petugas">
-            <span class="w-6 h-6 rounded-full bg-red-600 text-white flex items-center justify-center text-xs shadow-sm">
+        <div class="glass-card rounded-2xl p-5 w-full">
+          <label class="text-xs sm:text-sm font-bold text-red-400 uppercase flex items-center gap-2 mb-2.5 tracking-wider" for="petugas">
+            <span class="w-6 h-6 rounded-full bg-red-600/30 text-red-400 flex items-center justify-center text-xs border border-red-500/40">
               <i class="fa-solid fa-user"></i>
             </span>
             NAMA PETUGAS / KURIR
           </label>
           <div class="relative">
-            <input id="petugas" type="text" placeholder="Masukkan nama petugas..." autocomplete="off" class="w-full border-2 border-gray-200 rounded-xl py-2.5 px-4 text-sm font-semibold text-gray-800 focus:outline-none focus:border-red-500 transition">
-            <i class="fa-regular fa-id-badge absolute right-3.5 top-3 text-red-500 text-xl"></i>
+            <input id="petugas" type="text" placeholder="Masukkan nama petugas..." autocomplete="off" class="w-full bg-slate-900/80 border border-slate-700/80 rounded-xl py-3 px-4 text-sm sm:text-base font-semibold text-white placeholder-slate-500 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition">
+            <i class="fa-regular fa-id-badge absolute right-4 top-3.5 text-red-500 text-2xl"></i>
           </div>
         </div>
 
         <!-- 2. Ringkasan Resi Terrekam -->
-        <div class="bg-white/95 backdrop-blur-md rounded-2xl p-4 card-shadow border border-white/50 flex items-center justify-between">
-          <div class="bg-gradient-to-br from-red-600 to-red-800 text-white rounded-xl p-3 text-center w-24 flex flex-col items-center justify-center shadow-md">
-            <i class="fa-solid fa-chart-column text-xl mb-1"></i>
-            <span class="text-[9px] uppercase font-bold tracking-wider leading-none">HARI INI</span>
-            <span class="text-xs font-bold mt-1">0</span>
+        <div class="glass-card rounded-2xl p-5 flex items-center justify-between w-full">
+          <div class="bg-gradient-to-br from-red-600 to-red-900 text-white rounded-xl p-4 text-center w-28 flex flex-col items-center justify-center shadow-[0_0_15px_rgba(220,38,38,0.3)]">
+            <i class="fa-solid fa-chart-column text-2xl mb-1 text-amber-300"></i>
+            <span class="text-[10px] uppercase font-bold tracking-wider leading-none">HARI INI</span>
+            <span class="text-sm font-bold mt-1">0</span>
           </div>
-          <div class="text-center flex-1 px-3">
-            <p class="text-xs text-gray-500 font-extrabold uppercase tracking-wide">RESI TERREKAM HARI INI</p>
-            <p class="text-4xl sm:text-5xl font-black text-red-600 my-0.5"><span id="jumlah">0</span></p>
-            <p class="text-xs text-gray-600 font-medium">Terus semangat, <span class="text-red-600 italic font-bold">Merah Putih! ❤️</span></p>
+          <div class="text-center flex-1 px-4">
+            <p class="text-xs sm:text-sm text-gray-400 font-bold uppercase tracking-wider">RESI TERREKAM HARI INI</p>
+            <p class="text-4xl sm:text-6xl font-black text-red-500 my-1 drop-shadow-[0_0_15px_rgba(239,68,68,0.4)]"><span id="jumlah">0</span></p>
+            <p class="text-xs sm:text-sm text-gray-300 font-medium">Terus semangat, <span class="text-red-400 italic font-bold">Merah Putih! ❤️</span></p>
           </div>
-          <div class="w-20 h-20 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-700 font-bold text-xs border border-amber-200 shadow-inner">
+          <div class="w-20 h-20 sm:w-24 sm:h-24 bg-slate-900/90 rounded-2xl flex items-center justify-center text-amber-400 font-bold text-xs border border-slate-700/80 shadow-inner">
             <div class="text-center">
-              <i class="fa-solid fa-box-open text-3xl text-amber-800"></i>
-              <span class="block text-[9px] font-black text-red-600 leading-none mt-1">SPX</span>
+              <i class="fa-solid fa-box-open text-3xl sm:text-4xl text-amber-400"></i>
+              <span class="block text-[10px] font-black text-red-500 leading-none mt-1">SPX</span>
             </div>
           </div>
         </div>
 
         <!-- 3. Tombol Kamera & Galeri -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <label for="kameraInput" class="bg-gradient-to-r from-red-600 to-red-700 text-white p-4 rounded-2xl card-shadow flex items-center justify-between cursor-pointer active:scale-95 hover:opacity-95 transition">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center text-lg">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+          <label for="kameraInput" class="bg-gradient-to-r from-red-600 to-red-700 text-white p-4 rounded-2xl glass-card neon-border-red flex items-center justify-between cursor-pointer active:scale-95 hover:brightness-110 transition">
+            <div class="flex items-center gap-3.5">
+              <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center text-xl text-red-200 border border-white/10">
                 <i class="fa-solid fa-camera"></i>
               </div>
               <div>
-                <p class="text-xs font-bold uppercase leading-tight">AMBIL FOTO RESI</p>
-                <p class="text-[10px] text-red-100">Scan resi dengan kamera</p>
+                <p class="text-xs sm:text-sm font-bold uppercase leading-tight">AMBIL FOTO RESI</p>
+                <p class="text-[10px] sm:text-xs text-red-200">Scan resi dengan kamera</p>
               </div>
             </div>
             <i class="fa-solid fa-chevron-right text-xs opacity-70"></i>
           </label>
           <input id="kameraInput" type="file" accept="image/*" capture="environment" style="display:none" onchange="prosesFile(event)">
 
-          <label for="galeriInput" class="bg-white/95 text-gray-800 p-4 rounded-2xl card-shadow flex items-center justify-between border border-white/50 cursor-pointer active:scale-95 hover:bg-gray-50 transition">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-red-50 text-red-600 rounded-xl flex items-center justify-center text-lg">
+          <label for="galeriInput" class="glass-card text-white p-4 rounded-2xl flex items-center justify-between cursor-pointer active:scale-95 hover:bg-slate-800/80 transition">
+            <div class="flex items-center gap-3.5">
+              <div class="w-12 h-12 bg-red-950/50 text-red-400 rounded-xl flex items-center justify-center text-xl border border-red-800/40">
                 <i class="fa-regular fa-image"></i>
               </div>
               <div>
-                <p class="text-xs font-bold uppercase leading-tight">PILIH DARI GALERI</p>
-                <p class="text-[10px] text-gray-400">Pilih resi dari galeri</p>
+                <p class="text-xs sm:text-sm font-bold uppercase leading-tight">PILIH DARI GALERI</p>
+                <p class="text-[10px] sm:text-xs text-gray-400">Pilih resi dari galeri</p>
               </div>
             </div>
-            <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
+            <i class="fa-solid fa-chevron-right text-xs text-gray-500"></i>
           </label>
           <input id="galeriInput" type="file" accept="image/*" style="display:none" onchange="prosesFile(event)">
         </div>
 
         <!-- Preview Foto -->
-        <img id="foto" alt="Preview Resi" class="w-full max-h-72 object-contain rounded-2xl border-2 border-dashed border-gray-300 hidden bg-white/80 p-2">
+        <img id="foto" alt="Preview Resi" class="w-full max-h-80 object-contain rounded-2xl border-2 border-dashed border-red-500/30 hidden bg-slate-900/90 p-2">
 
         <!-- Status Bar -->
-        <div id="status" class="bg-white/90 backdrop-blur-md rounded-2xl p-3.5 text-center text-xs font-bold text-gray-600 border border-white/50 card-shadow">
+        <div id="status" class="glass-card rounded-2xl p-4 text-center text-xs sm:text-sm font-bold text-gray-300 border border-slate-700/60 w-full">
           Siap. Ambil foto resi untuk mulai membaca.
         </div>
 
         <!-- Card Hasil Deteksi Otomatis -->
-        <div id="hasil" class="bg-white/95 backdrop-blur-md rounded-2xl p-4 card-shadow border border-red-100 hidden">
-          <div class="flex items-center justify-between border-b border-gray-100 pb-2 mb-2">
-            <div class="flex items-center gap-2 text-teal-600">
+        <div id="hasil" class="glass-card rounded-2xl p-5 border border-emerald-500/30 hidden w-full">
+          <div class="flex items-center justify-between border-b border-slate-700/80 pb-2 mb-2">
+            <div class="flex items-center gap-2 text-emerald-400">
               <i class="fa-solid fa-magnifying-glass text-sm"></i>
-              <span class="text-xs font-bold uppercase text-gray-500">Hasil Deteksi Otomatis:</span>
+              <span class="text-xs font-bold uppercase text-gray-400">Hasil Deteksi Otomatis:</span>
             </div>
-            <i class="fa-solid fa-print text-2xl text-gray-300"></i>
+            <i class="fa-solid fa-print text-2xl text-slate-700"></i>
           </div>
           
-          <div id="hasilText" class="text-center font-extrabold text-red-600 text-lg my-1"></div>
+          <div id="hasilText" class="text-center font-black text-red-400 text-xl my-2"></div>
 
-          <button id="tambahBtn" class="w-full mt-3 bg-gradient-to-r from-red-600 to-red-700 text-white p-3.5 rounded-xl card-shadow flex items-center justify-between active:scale-98 transition" style="display:none" onclick="gunakanHasil()">
+          <button id="tambahBtn" class="w-full mt-3 bg-gradient-to-r from-red-600 to-red-700 text-white p-3.5 rounded-xl shadow-lg flex items-center justify-between active:scale-98 transition" style="display:none" onclick="gunakanHasil()">
             <div class="flex items-center gap-2.5">
               <div class="w-7 h-7 border border-white/40 rounded-lg flex items-center justify-center text-xs">
                 <i class="fa-solid fa-plus"></i>
               </div>
               <div class="text-left">
                 <p class="text-xs font-extrabold uppercase">TAMBAHKAN NOMOR INI</p>
-                <p class="text-[10px] text-red-100">Simpan ke daftar resi</p>
+                <p class="text-[10px] text-red-200">Simpan ke daftar resi</p>
               </div>
             </div>
             <i class="fa-solid fa-chevron-right text-xs opacity-80"></i>
@@ -190,13 +214,13 @@
 
       </div>
 
-      <!-- ================= KOLOM KANAN (INPUT MANUAL, DAFTAR RESI, STATS) ================= -->
-      <div class="lg:col-span-5 space-y-4">
+      <!-- ================= KOLOM KANAN (INPUT MANUAL & LIST) ================= -->
+      <div class="lg:col-span-5 md:col-span-1 space-y-5">
 
         <!-- 4. Form Input Manual -->
-        <div class="bg-white/95 backdrop-blur-md rounded-2xl p-4 card-shadow border border-white/50">
-          <label class="text-xs font-black text-gray-700 uppercase flex items-center gap-2 mb-2">
-            <i class="fa-regular fa-keyboard text-gray-500 text-sm"></i>
+        <div class="glass-card rounded-2xl p-5 w-full">
+          <label class="text-xs sm:text-sm font-bold text-gray-300 uppercase flex items-center gap-2 mb-2.5 tracking-wider">
+            <i class="fa-regular fa-keyboard text-red-400 text-base"></i>
             INPUT RESI MANUAL
           </label>
           <div class="flex gap-2">
@@ -207,60 +231,60 @@
               autocomplete="off"
               autocorrect="off"
               capitalize="characters"
-              class="flex-1 border-2 border-gray-200 rounded-xl px-3.5 py-2 text-xs font-bold focus:outline-none focus:border-red-500"
+              class="flex-1 bg-slate-900/80 border border-slate-700/80 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold text-white placeholder-slate-500 focus:outline-none focus:border-red-500"
             >
             <button 
               id="btnTambahManual"
               type="button" 
-              class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 active:scale-95 transition shadow-sm"
+              class="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 active:scale-95 transition shadow-lg shadow-red-600/30"
             >
-              <i class="fa-solid fa-plus text-[10px]"></i>
+              <i class="fa-solid fa-plus text-xs"></i>
               Tambah
             </button>
           </div>
         </div>
 
         <!-- 5. Daftar Resi & Action -->
-        <div class="bg-white/95 backdrop-blur-md rounded-2xl p-4 card-shadow border border-white/50">
-          <div class="flex justify-between items-center mb-3 pb-2 border-b border-gray-100">
-            <span class="text-xs font-black text-gray-700 uppercase flex items-center gap-1.5">
-              <i class="fa-solid fa-list-check text-red-600"></i> DAFTAR RESI
+        <div class="glass-card rounded-2xl p-5 w-full">
+          <div class="flex justify-between items-center mb-3 pb-2.5 border-b border-slate-700/80">
+            <span class="text-xs sm:text-sm font-bold text-gray-300 uppercase flex items-center gap-2 tracking-wider">
+              <i class="fa-solid fa-list-check text-red-500"></i> DAFTAR RESI
             </span>
-            <button type="button" class="text-xs text-red-600 font-bold hover:underline" onclick="hapusSemua()">
+            <button type="button" class="text-xs text-red-400 font-bold hover:underline hover:text-red-300" onclick="hapusSemua()">
               <i class="fa-solid fa-trash-can mr-1"></i>Hapus Semua
             </button>
           </div>
 
-          <div id="daftar" class="divide-y divide-gray-100 max-h-72 min-h-[120px] overflow-y-auto"></div>
+          <div id="daftar" class="divide-y divide-slate-800 max-h-80 min-h-[140px] overflow-y-auto"></div>
 
-          <button type="button" class="w-full mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white p-3.5 rounded-xl font-black text-xs uppercase flex items-center justify-center gap-2 shadow-lg active:scale-98 transition" onclick="kirimSemua()">
-            <i class="fa-solid fa-paper-plane"></i>
+          <button type="button" class="w-full mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white p-4 rounded-xl font-black text-xs sm:text-sm uppercase flex items-center justify-center gap-2 shadow-lg shadow-blue-600/25 active:scale-98 transition" onclick="kirimSemua()">
+            <i class="fa-solid fa-paper-plane text-base"></i>
             KIRIM SEMUA RESI
           </button>
         </div>
 
         <!-- 6. Footer Stats Badge -->
-        <div class="bg-white/95 backdrop-blur-md rounded-2xl p-4 card-shadow border border-white/50 grid grid-cols-3 divide-x divide-gray-100 text-center">
+        <div class="glass-card rounded-2xl p-4 grid grid-cols-3 divide-x divide-slate-800 text-center w-full">
           <div class="px-2 flex flex-col items-center">
-            <div class="flex items-center gap-1 text-red-600 text-xs font-bold mb-1">
+            <div class="flex items-center gap-1 text-red-400 text-xs font-bold mb-1">
               <i class="fa-solid fa-chart-simple"></i>
-              <span class="text-[9px] text-gray-400 uppercase">RESI HARI INI</span>
+              <span class="text-[9px] sm:text-[10px] text-gray-400 uppercase">RESI HARI INI</span>
             </div>
-            <span class="text-base font-black text-gray-800">0</span>
+            <span class="text-base sm:text-lg font-black text-white">0</span>
           </div>
 
           <div class="px-2 flex flex-col items-center">
-            <div class="flex items-center gap-1 text-red-600 text-xs font-bold mb-1">
+            <div class="flex items-center gap-1 text-red-400 text-xs font-bold mb-1">
               <i class="fa-solid fa-bullseye"></i>
-              <span class="text-[9px] text-gray-400 uppercase">TARGET HARI INI</span>
+              <span class="text-[9px] sm:text-[10px] text-gray-400 uppercase">TARGET HARI INI</span>
             </div>
-            <span class="text-base font-black text-gray-800">100</span>
+            <span class="text-base sm:text-lg font-black text-white">100</span>
           </div>
 
           <div class="px-2 flex flex-col items-center justify-center">
-            <i class="fa-solid fa-award text-amber-500 text-sm mb-0.5"></i>
-            <span class="text-[8px] font-black text-gray-400 uppercase leading-none">SEMANGAT</span>
-            <span class="text-xs font-black text-red-600">MERDEKA!</span>
+            <i class="fa-solid fa-award text-amber-400 text-base mb-0.5"></i>
+            <span class="text-[8px] sm:text-[9px] font-bold text-gray-400 uppercase leading-none">SEMANGAT</span>
+            <span class="text-xs sm:text-sm font-black text-red-500">MERDEKA!</span>
           </div>
         </div>
 
@@ -270,38 +294,38 @@
   </div>
 
   <!-- ================= BOTTOM NAVIGATION BAR ================= -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 px-4 py-2.5 z-50 shadow-lg">
-    <div class="max-w-md mx-auto flex justify-between items-center relative">
-      <a href="#" class="flex flex-col items-center text-red-600 w-12">
-        <i class="fa-solid fa-house text-base"></i>
-        <span class="text-[9px] font-bold mt-1">Beranda</span>
+  <nav class="fixed bottom-0 left-0 right-0 bg-slate-950/90 backdrop-blur-lg border-t border-slate-800 px-4 py-2.5 z-50 shadow-2xl">
+    <div class="max-w-xl mx-auto flex justify-between items-center relative">
+      <a href="#" class="flex flex-col items-center text-red-500 w-12">
+        <i class="fa-solid fa-house text-lg"></i>
+        <span class="text-[10px] font-bold mt-1">Beranda</span>
       </a>
 
-      <a href="#" class="flex flex-col items-center text-gray-400 hover:text-red-600 w-12">
-        <i class="fa-regular fa-clock text-base"></i>
-        <span class="text-[9px] font-medium mt-1">Riwayat</span>
+      <a href="#" class="flex flex-col items-center text-gray-500 hover:text-red-400 w-12 transition">
+        <i class="fa-regular fa-clock text-lg"></i>
+        <span class="text-[10px] font-medium mt-1">Riwayat</span>
       </a>
 
       <div class="relative -top-5">
-        <label for="kameraInput" class="w-14 h-14 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-full flex flex-col items-center justify-center shadow-xl border-4 border-white cursor-pointer active:scale-95 transition">
-          <i class="fa-solid fa-expand text-lg"></i>
-          <span class="text-[8px] font-bold">Scan</span>
+        <label for="kameraInput" class="w-14 h-14 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-full flex flex-col items-center justify-center shadow-[0_0_20px_rgba(239,68,68,0.5)] border-4 border-slate-900 cursor-pointer active:scale-95 transition">
+          <i class="fa-solid fa-expand text-xl"></i>
+          <span class="text-[9px] font-bold">Scan</span>
         </label>
       </div>
 
-      <a href="#" class="flex flex-col items-center text-gray-400 hover:text-red-600 w-12">
-        <i class="fa-solid fa-chart-line text-base"></i>
-        <span class="text-[9px] font-medium mt-1">Statistik</span>
+      <a href="#" class="flex flex-col items-center text-gray-500 hover:text-red-400 w-12 transition">
+        <i class="fa-solid fa-chart-line text-lg"></i>
+        <span class="text-[10px] font-medium mt-1">Statistik</span>
       </a>
 
-      <a href="#" class="flex flex-col items-center text-gray-400 hover:text-red-600 w-12">
-        <i class="fa-solid fa-gear text-base"></i>
-        <span class="text-[9px] font-medium mt-1">Pengaturan</span>
+      <a href="#" class="flex flex-col items-center text-gray-500 hover:text-red-400 w-12 transition">
+        <i class="fa-solid fa-gear text-lg"></i>
+        <span class="text-[10px] font-medium mt-1">Pengaturan</span>
       </a>
     </div>
   </nav>
 
-  <!-- ================= SCRIPT LOGIC (NATIVE JAVASCRIPT UNTUK OCR & STORAGE) ================= -->
+  <!-- ================= SCRIPT LOGIC (NATIVE JAVASCRIPT UTUH) ================= -->
   <script>
     const APPS_SCRIPT_URL = "https://script.google.com/a/macros/spxexpress.com/s/AKfycbyES7UK3oV0nDdccdfp3Rl0nj3IVmb4gY0zbT9aL2ijsD8rLAOHtrGcZOyP3gYdTllC2w/exec";
 
@@ -327,20 +351,20 @@
       elDaftar.innerHTML = "";
 
       if (resi.length === 0) {
-        elDaftar.innerHTML = "<div class='text-center text-gray-400 text-xs py-8'>Belum ada resi yang ditambahkan.</div>";
+        elDaftar.innerHTML = "<div class='text-center text-gray-500 text-xs py-8'>Belum ada resi yang ditambahkan.</div>";
         return;
       }
 
       resi.forEach(function(nomor, index) {
         const divItem = document.createElement("div");
-        divItem.className = "flex justify-between items-center py-2.5 text-xs hover:bg-gray-50 px-1 rounded-lg transition";
+        divItem.className = "flex justify-between items-center py-2.5 text-xs hover:bg-slate-800/50 px-2 rounded-lg transition";
         divItem.innerHTML = `
           <div class="flex items-center gap-2">
-            <span class="text-gray-400 font-semibold text-[10px]">${index + 1}.</span>
-            <span class="font-black text-gray-800 tracking-wide">${nomor}</span>
+            <span class="text-gray-500 font-semibold text-[10px]">${index + 1}.</span>
+            <span class="font-black text-gray-100 tracking-wide text-sm">${nomor}</span>
           </div>
-          <button type="button" class="text-red-500 hover:text-red-700 font-bold px-2 py-1 rounded hover:bg-red-50 transition" onclick="hapusResi(${index})">
-            <i class="fa-solid fa-xmark text-sm"></i>
+          <button type="button" class="text-red-400 hover:text-red-300 font-bold px-2 py-1 rounded hover:bg-red-950/40 transition" onclick="hapusResi(${index})">
+            <i class="fa-solid fa-xmark text-base"></i>
           </button>
         `;
         elDaftar.appendChild(divItem);
@@ -380,47 +404,4 @@
       tampilkan();
       
       elStatus.innerText = "✅ Resi " + nomor + " berhasil ditambahkan.";
-      elStatus.className = "bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-2xl p-3.5 text-center text-xs font-bold card-shadow";
-    }
-
-    function gunakanHasil() {
-      if (!hasilNomor) return;
-      tambahResi(hasilNomor);
-      
-      elHasilContainer.classList.add("hidden");
-      elTambahBtn.style.display = "none";
-      elFoto.classList.add("hidden");
-      elStatus.innerText = "Siap untuk scan berikutnya.";
-      elStatus.className = "bg-white/90 backdrop-blur-md rounded-2xl p-3.5 text-center text-xs font-bold text-gray-600 border border-white/50 card-shadow";
-    }
-
-    function prosesFile(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      prosesGambar(file);
-      event.target.value = "";
-    }
-
-    async function prosesGambar(file) {
-      elHasilContainer.classList.add("hidden");
-      elTambahBtn.style.display = "none";
-      hasilNomor = "";
-
-      elFoto.src = URL.createObjectURL(file);
-      elFoto.classList.remove("hidden");
-
-      elStatus.innerText = "🔍 Sedang membaca tulisan...";
-      elStatus.className = "bg-blue-50 text-blue-600 border border-blue-200 rounded-2xl p-3.5 text-center text-xs font-bold card-shadow";
-
-      try {
-        const result = await Tesseract.recognize(file, "eng", {
-          logger: function(info) {
-            if (info.status === "recognizing text") {
-              const persen = Math.round(info.progress * 100);
-              elStatus.innerText = "⏳ Membaca... (" + persen + "%)";
-            }
-          }
-        });
-
-        const teksMentah = result.data.text;
-        elHasil
+      elStatus.className = "glass-card rounded
