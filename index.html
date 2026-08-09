@@ -184,24 +184,30 @@ video {
       playsinline>
     </video>
 
-    <button
-      class="blue"
-      onclick="ambilFoto()">
-      📸 FOTO & BACA NOMOR
-    </button>
+    <label for="kameraInput" class="green tombol">
+  📷 FOTO NOMOR RESI
+</label>
 
-    <button
-      class="gray"
-      onclick="pilihFoto()">
-      🖼️ PILIH FOTO DARI GALERI
-    </button>
+<input
+  id="kameraInput"
+  type="file"
+  accept="image/*"
+  capture="environment"
+  style="display:none"
+  onchange="prosesFile(event)"
+>
 
-    <input
-      id="fileFoto"
-      type="file"
-      accept="image/*"
-      style="display:none"
-      onchange="prosesFile(event)"
+<label for="galeriInput" class="gray tombol">
+  🖼️ PILIH FOTO DARI GALERI
+</label>
+
+<input
+  id="galeriInput"
+  type="file"
+  accept="image/*"
+  style="display:none"
+  onchange="prosesFile(event)"
+>
     >
 
     <canvas
