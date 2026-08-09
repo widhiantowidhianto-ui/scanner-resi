@@ -1,1 +1,550 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
+<title>Scanner Resi</title>
+
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.header {
+  background: #16a34a;
+  color: white;
+  padding: 18px;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  padding: 15px;
+}
+
+.card {
+  background: white;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+input {
+  width: 100%;
+  padding: 14px;
+  margin-top: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  border: 0;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.green {
+  background: #16a34a;
+  color: white;
+}
+
+.red {
+  background: #dc2626;
+  color: white;
+}
+
+.gray {
+  background: #e5e7eb;
+}
+
+.total {
+  text-align: center;
+  font-size: 30px;
+  font-weight: bold;
+  color: #16a34a;
+  margin-bottom: 15px;
+}
+
+#reader {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.resi {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 5px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.resi button {
+  width: auto;
+  padding: 7px 12px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.status {
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.small {
+  color: #6b7280;
+  font-size: 13px;
+  margin-top: 8px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+📦 Scanner Resi
+</div>
+
+<div class="container">
+
+  <div class="card">
+
+    <b>Nama Petugas</b>
+
+    <input
+      id="petugas"
+      placeholder="Contoh: Dhian"
+      autocomplete="off"
+    >
+
+  </div>
+
+  <div class="card">
+
+    <div class="total">
+      <span id="jumlah">0</span> RESI
+    </div>
+
+    <div id="reader"></div>
+
+    <button
+      class="green"
+      onclick="mulaiScan()">
+      📷 MULAI SCAN
+    </button>
+
+    <button
+      class="gray"
+      onclick="berhentiScan()">
+      ⏹ STOP KAMERA
+    </button>
+
+    <button
+      class="gray"
+      onclick="inputManual()">
+      ✍️ INPUT MANUAL
+    </button>
+
+    <div id="status" class="status">
+      Siap digunakan.
+    </div>
+
+    <div class="small">
+      Arahkan kamera ke barcode resi. Setelah terbaca,
+      nomor otomatis masuk ke daftar.
+    </div>
+
+  </div>
+
+  <div class="card">
+
+    <b>Daftar Resi</b>
+
+    <div id="daftar"></div>
+
+  </div>
+
+  <div class="card">
+
+    <button
+      class="green"
+      onclick="kirimSemua()">
+      🚀 KIRIM SEMUA RESI
+    </button>
+
+    <button
+      class="red"
+      onclick="hapusSemua()">
+      🗑 HAPUS SEMUA
+    </button>
+
+  </div>
+
+</div>
+
+<script>
+
+const APPS_SCRIPT_URL =
+"https://script.google.com/a/macros/spxexpress.com/s/AKfycbz5eS8WeGfnkHWeLD6AKBjdW78LIWgdH-Tzv_pvzWz9u0MexAOMEIFtfoD9A3RrI42WXw/exec";
+
+let scanner = null;
+let sedangScan = false;
+
+let resi = JSON.parse(
+  localStorage.getItem("scanner_resi") || "[]"
+);
+
+const petugasInput =
+  document.getElementById("petugas");
+
+petugasInput.value =
+  localStorage.getItem("scanner_petugas") || "";
+
+petugasInput.addEventListener(
+  "input",
+  function() {
+
+    localStorage.setItem(
+      "scanner_petugas",
+      petugasInput.value
+    );
+
+  }
+);
+
+function simpanLocal() {
+
+  localStorage.setItem(
+    "scanner_resi",
+    JSON.stringify(resi)
+  );
+
+}
+
+function tampilkan() {
+
+  document.getElementById("jumlah").innerText =
+    resi.length;
+
+  const daftar =
+    document.getElementById("daftar");
+
+  daftar.innerHTML = "";
+
+  resi.forEach(function(nomor, index) {
+
+    const div =
+      document.createElement("div");
+
+    div.className = "resi";
+
+    div.innerHTML = `
+      <span>
+        ${index + 1}. <b>${nomor}</b>
+      </span>
+
+      <button
+        class="red"
+        onclick="hapusResi(${index})">
+        HAPUS
+      </button>
+    `;
+
+    daftar.appendChild(div);
+
+  });
+
+}
+
+function tambahResi(nomor) {
+
+  nomor = String(nomor)
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "");
+
+  if (!nomor) return;
+
+  if (nomor.length < 5) {
+
+    document.getElementById("status").innerText =
+      "⚠️ Barcode terbaca tetapi terlalu pendek.";
+
+    return;
+
+  }
+
+  if (resi.includes(nomor)) {
+
+    document.getElementById("status").innerText =
+      "⚠️ Resi sudah ada: " + nomor;
+
+    return;
+
+  }
+
+  resi.push(nomor);
+
+  simpanLocal();
+
+  tampilkan();
+
+  document.getElementById("status").innerText =
+    "✅ Berhasil: " + nomor;
+
+}
+
+async function mulaiScan() {
+
+  if (sedangScan) return;
+
+  try {
+
+    scanner =
+      new Html5Qrcode("reader");
+
+    sedangScan = true;
+
+    document.getElementById("status").innerText =
+      "📷 Meminta izin kamera...";
+
+    await scanner.start(
+
+      {
+        facingMode: "environment"
+      },
+
+      {
+        fps: 15,
+
+        qrbox: {
+          width: 280,
+          height: 140
+        },
+
+        aspectRatio: 1.7777778
+      },
+
+      function(decodedText) {
+
+        tambahResi(decodedText);
+
+        // Beri jeda agar barcode yang sama
+        // tidak terbaca berkali-kali terlalu cepat.
+
+        scanner.pause(true);
+
+        setTimeout(function() {
+
+          if (sedangScan) {
+            scanner.resume();
+          }
+
+        }, 1200);
+
+      },
+
+      function(errorMessage) {
+
+        // Error pembacaan frame normal.
+        // Tidak perlu ditampilkan.
+
+      }
+
+    );
+
+    document.getElementById("status").innerText =
+      "🟢 Kamera aktif. Arahkan ke barcode.";
+
+  } catch(error) {
+
+    sedangScan = false;
+
+    document.getElementById("status").innerText =
+      "❌ Kamera gagal dibuka: " +
+      error;
+
+  }
+
+}
+
+async function berhentiScan() {
+
+  if (!scanner || !sedangScan) return;
+
+  try {
+
+    await scanner.stop();
+
+    scanner.clear();
+
+  } catch(error) {
+
+    console.log(error);
+
+  }
+
+  sedangScan = false;
+
+  document.getElementById("status").innerText =
+    "⏹ Kamera dihentikan.";
+
+}
+
+function inputManual() {
+
+  const nomor =
+    prompt("Masukkan nomor resi:");
+
+  if (nomor) {
+
+    tambahResi(nomor);
+
+  }
+
+}
+
+function hapusResi(index) {
+
+  resi.splice(index, 1);
+
+  simpanLocal();
+
+  tampilkan();
+
+}
+
+function hapusSemua() {
+
+  if (!confirm(
+    "Yakin ingin menghapus semua resi?"
+  )) return;
+
+  resi = [];
+
+  simpanLocal();
+
+  tampilkan();
+
+}
+
+async function kirimSemua() {
+
+  const petugas =
+    petugasInput.value.trim();
+
+  if (!petugas) {
+
+    alert("Masukkan nama petugas.");
+
+    return;
+
+  }
+
+  if (resi.length === 0) {
+
+    alert("Belum ada resi.");
+
+    return;
+
+  }
+
+  const batch =
+    petugas.toUpperCase()
+    + "-"
+    + Date.now();
+
+  const data = {
+
+    petugas: petugas,
+
+    batch: batch,
+
+    resi: resi
+
+  };
+
+  document.getElementById("status").innerText =
+    "⏳ Mengirim " + resi.length + " resi...";
+
+  /*
+   * Untuk sementara data dikirim memakai
+   * mode no-cors.
+   *
+   * Setelah backend Apps Script kita ubah
+   * menerima format ini, data akan masuk
+   * ke Google Sheet.
+   */
+
+  try {
+
+    await fetch(
+      APPS_SCRIPT_URL,
+      {
+        method: "POST",
+
+        mode: "no-cors",
+
+        headers: {
+          "Content-Type":
+            "text/plain;charset=utf-8"
+        },
+
+        body: JSON.stringify(data)
+      }
+    );
+
+    alert(
+      "✅ Data sudah dikirim ke pusat."
+    );
+
+    resi = [];
+
+    simpanLocal();
+
+    tampilkan();
+
+    document.getElementById("status").innerText =
+      "✅ Batch berhasil dikirim.";
+
+  } catch(error) {
+
+    document.getElementById("status").innerText =
+      "❌ Gagal mengirim data.";
+
+    alert(
+      "❌ Pengiriman gagal.\n" +
+      error.message
+    );
+
+  }
+
+}
+
+tampilkan();
+
+</script>
+
+</body>
+  </html>
