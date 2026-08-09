@@ -3,36 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SPX OCR SCANER PRO</title>
+  <title>Scanner Resi OCR Pro</title>
 
   <!-- Library Tesseract OCR -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
   <style>
-    /* Reset & Base Styles */
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
-    
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #f8fafc; /* Slate 50 - Background super bersih */
-      color: #1e293b; /* Slate 800 - Teks utama */
+      background-color: #f8fafc;
+      color: #1e293b;
       line-height: 1.5;
-      padding-bottom: 40px; /* Ruang di bawah */
+      padding-bottom: 40px;
     }
 
-    /* Header Modern */
     .header {
-      background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); /* Gradasi Hijau */
+      background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
       color: white;
       padding: 20px 15px;
       font-size: 22px;
       font-weight: 800;
       text-align: center;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
       letter-spacing: -0.5px;
     }
 
@@ -42,58 +40,49 @@
       font-size: 18px;
     }
 
-    /* Main Container */
     .container {
       max-width: 540px;
       margin: 0 auto;
       padding: 20px 15px;
     }
 
-    /* Card Styling - Elegant & Clean */
     .card {
       background: white;
       padding: 20px;
       margin-bottom: 20px;
-      border-radius: 16px; /* Lebih rounded */
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02); /* Bayangan halus */
-      border: 1px solid #f1f5f9; /* Border tipis */
+      border-radius: 16px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04);
+      border: 1px solid #f1f5f9;
     }
 
-    /* Typography & Labels */
     label.title, .card-title {
       display: block;
       margin-bottom: 10px;
       font-size: 15px;
       font-weight: 700;
-      color: #475569; /* Slate 600 */
+      color: #475569;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
-    /* Input Fields */
     input[type="text"] {
       width: 100%;
       padding: 14px 16px;
-      border: 2px solid #e2e8f0; /* Slate 200 */
+      border: 2px solid #e2e8f0;
       border-radius: 12px;
       font-size: 16px;
       color: #1e293b;
       background-color: white;
       transition: all 0.2s ease-in-out;
-      -webkit-appearance: none; /* Fix for iOS */
+      -webkit-appearance: none;
     }
 
     input[type="text"]:focus {
       outline: none;
-      border-color: #16a34a; /* Hijau saat fokus */
+      border-color: #16a34a;
       box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
     }
 
-    input[type="text"]::placeholder {
-      color: #94a3b8; /* Slate 400 */
-    }
-
-    /* Buttons Style - Modern & Tactile */
     .button-group {
       display: flex;
       flex-direction: column;
@@ -115,30 +104,18 @@
       text-align: center;
       text-decoration: none;
       transition: all 0.2s ease;
-      position: relative;
-      overflow: hidden;
     }
 
-    /* Efek klik tombol */
     button:active, .tombol-btn:active {
       transform: translateY(1px);
       filter: brightness(95%);
     }
 
-    /* Variants Tombol */
     .btn-main { background-color: #16a34a; color: white; box-shadow: 0 4px 6px rgba(22, 163, 74, 0.2); }
-    .btn-main:hover { background-color: #15803d; }
-
     .btn-secondary { background-color: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
-    .btn-secondary:hover { background-color: #e2e8f0; }
-
     .btn-action { background-color: #2563eb; color: white; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2); }
-    .btn-action:hover { background-color: #1d4ed8; }
-
     .btn-danger { background-color: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
-    .btn-danger:hover { background-color: #fecaca; }
 
-    /* Area Foto & Scan */
     #foto {
       width: 100%;
       max-height: 280px;
@@ -150,15 +127,14 @@
       background-color: #f1f5f9;
     }
 
-    /* Area Hasil OCR */
     .hasil-container {
       margin-top: 15px;
       display: none;
     }
 
     .hasil-box {
-      background-color: #f0fdf4; /* Hijau super muda */
-      border: 2px dashed #bbf7d0; /* Border putus-putus */
+      background-color: #f0fdf4;
+      border: 2px dashed #bbf7d0;
       padding: 15px;
       border-radius: 12px;
       word-break: break-all;
@@ -172,7 +148,7 @@
     }
 
     .raw-text {
-      color: #64748b; /* Slate 500 - Text mentah tidak terlalu dominan */
+      color: #64748b;
       font-size: 13px;
       max-height: 80px;
       overflow-y: auto;
@@ -182,7 +158,6 @@
       border-top: 1px solid #d1fae5;
     }
 
-    /* Counter Resi */
     .total-container {
       text-align: center;
       margin-bottom: 15px;
@@ -204,7 +179,6 @@
       line-height: 1;
     }
 
-    /* Input Manual Bar */
     .input-manual-bar {
       display: flex;
       gap: 10px;
@@ -218,9 +192,9 @@
     .input-manual-bar button {
       width: auto;
       padding: 14px 20px;
+      white-space: nowrap;
     }
 
-    /* Daftar Resi */
     #daftar {
       margin-top: 10px;
     }
@@ -229,14 +203,9 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 14px;
+      padding: 12px 14px;
       background-color: white;
       border-bottom: 1px solid #f1f5f9;
-      transition: background-color 0.2s;
-    }
-
-    .resi-item:hover {
-      background-color: #f8fafc;
     }
 
     .resi-item:last-child {
@@ -253,11 +222,10 @@
       font-size: 12px;
       color: #94a3b8;
       font-weight: 600;
-      width: 24px;
     }
 
     .resi-value {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
       color: #1e293b;
       word-break: break-all;
@@ -268,11 +236,8 @@
       margin: 0;
       padding: 6px 12px;
       font-size: 12px;
-      font-weight: 600;
-      border-radius: 8px;
     }
 
-    /* Status Bar */
     .status-bar {
       margin-top: 15px;
       padding: 12px;
@@ -285,11 +250,10 @@
       border: 1px solid #e2e8f0;
     }
 
-    /* Utilities */
     .empty-state {
       text-align: center;
       color: #94a3b8;
-      padding: 20px 0;
+      padding: 15px 0;
       font-size: 14px;
     }
   </style>
@@ -305,14 +269,14 @@
 
   <!-- Identitas Petugas -->
   <div class="card">
-    <label class="title" for="petugas">👤 Nama Petugas / Kurir</label>
-    <input id="petugas" type="text" placeholder="Contoh: Dhian Purnomo" autocomplete="off">
+    <label class="title" for="petugas">👤 NAMA PETUGAS / KURIR</label>
+    <input id="petugas" type="text" placeholder="Contoh: Dhian" autocomplete="off">
   </div>
 
   <!-- Area Pindaian OCR -->
   <div class="card">
     <div class="total-container">
-      <div class="total-label">Resi Terrekam</div>
+      <div class="total-label">RESI TERREKAM</div>
       <div class="total-number"><span id="jumlah">0</span></div>
     </div>
 
@@ -320,7 +284,6 @@
       <label for="kameraInput" class="tombol-btn btn-main">
         📷 AMBIL FOTO RESI
       </label>
-      <!-- Input file disembunyikan -->
       <input id="kameraInput" type="file" accept="image/*" capture="environment" style="display:none" onchange="prosesFile(event)">
 
       <label for="galeriInput" class="tombol-btn btn-secondary">
@@ -350,43 +313,38 @@
     </div>
   </div>
 
-  <!-- Input Manual Resi (Backup) -->
+  <!-- Input Manual Resi -->
   <div class="card">
-    <div class="card-title">⌨️ Input Resi Manual</div>
+    <div class="card-title">⌨️ INPUT RESI MANUAL</div>
     <div class="input-manual-bar">
-      <input id="manualResi" type="text" placeholder="Masukkan SPXID...">
-      <button class="btn-action" onclick="tambahManual()">+ Tambah</button>
+      <input id="manualResi" type="text" placeholder="SPXID068255909326" onkeypress="handleKeyPress(event)">
+      <button type="button" class="btn-action" onclick="tambahManual()">+ Tambah</button>
     </div>
   </div>
 
   <!-- Daftar Resi -->
   <div class="card">
-    <div class="card-title">📄 Daftar Resi</div>
-    <div id="daftar">
-      <!-- Item resi akan muncul di sini -->
-    </div>
+    <div class="card-title">📄 DAFTAR RESI</div>
+    <div id="daftar"></div>
   </div>
 
   <!-- Aksi Kirim/Hapus -->
   <div class="card" style="background-color: transparent; box-shadow: none; border: none; padding: 0;">
     <div class="button-group">
-      <button class="btn-action" onclick="kirimSemua()">🚀 KIRIM SEMUA RESI</button>
-      <button class="btn-danger" onclick="hapusSemua()">🗑️ HAPUS SEMUA</button>
+      <button type="button" class="btn-action" onclick="kirimSemua()">🚀 KIRIM SEMUA RESI</button>
+      <button type="button" class="btn-danger" onclick="hapusSemua()">🗑️ HAPUS SEMUA</button>
     </div>
   </div>
 
 </div>
 
 <script>
-  // --- KONFIGURASI ---
-  const APPS_SCRIPT_URL = "https://script.google.com/a/macros/spxexpress.com/s/AKfycbzMwkx6yYYu63IHNDiwKl7GwXggLjJSEOOhA-dFlKIOyjW0QzHquJ3iQFDdc8JHrm9hAw/exec"
-  
-  // --- STATE APLIKASI ---
+  // URL APPS SCRIPT WORK SPX
+  const APPS_SCRIPT_URL = "https://script.google.com/a/macros/spxexpress.com/s/AKfycbz5eS8WeGfnkHWeLD6AKBjdW78LIWgdH-Tzv_pvzWz9u0MexAOMEIFtfoD9A3RrI42WXw/exec";
+
   let hasilNomor = "";
-  // Ambil data dari LocalStorage saat load awal
   let resi = JSON.parse(localStorage.getItem("scanner_resi") || "[]");
 
-  // --- ELEMEN UI ---
   const elStatus = document.getElementById("status");
   const elFoto = document.getElementById("foto");
   const elHasilContainer = document.getElementById("hasil");
@@ -396,17 +354,13 @@
   const elDaftar = document.getElementById("daftar");
   const elJumlah = document.getElementById("jumlah");
 
-  // Load Nama Petugas
+  // Load Nama Petugas dari storage
   elPetugas.value = localStorage.getItem("scanner_petugas") || "";
-
-  // Simpan Nama Petugas saat diketik
   elPetugas.addEventListener("input", function() {
     localStorage.setItem("scanner_petugas", elPetugas.value);
   });
 
-  // --- FUNGSI UTAMA ---
-
-  // Update Tampilan Daftar Resi & Counter
+  // Tampilkan daftar resi awal
   function tampilkan() {
     elJumlah.innerText = resi.length;
     elDaftar.innerHTML = "";
@@ -416,127 +370,70 @@
       return;
     }
 
-    // Buat elemen daftar dari array resi
     resi.forEach(function(nomor, index) {
       const divItem = document.createElement("div");
       divItem.className = "resi-item";
-      
       divItem.innerHTML = `
         <div class="resi-info">
           <span class="resi-number-tag">${index + 1}.</span>
           <span class="resi-value">${nomor}</span>
         </div>
-        <button class="btn-danger" onclick="hapusResi(${index})">Hapus</button>
+        <button type="button" class="btn-danger" onclick="hapusResi(${index})">Hapus</button>
       `;
       elDaftar.appendChild(divItem);
     });
   }
 
-  // Simpan array resi ke LocalStorage
   function simpan() {
     localStorage.setItem("scanner_resi", JSON.stringify(resi));
   }
 
-  // Handler saat file dipilih (Kamera/Galeri)
-  function prosesFile(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    prosesGambar(file);
-    // Reset input file agar bisa memilih file yang sama lagi jika perlu
-    event.target.value = "";
-  }
-
-  // Inti Proses OCR
-  async function prosesGambar(file) {
-    // Reset Tampilan
-    elHasilContainer.style.display = "none";
-    elTambahBtn.style.display = "none";
-    hasilNomor = "";
-
-    // Tampilkan Preview Foto
-    elFoto.src = URL.createObjectURL(file);
-    elFoto.style.display = "block";
-
-    elStatus.innerText = "🔍 Sedang membaca tulisan...";
-    elStatus.style.color = "#2563eb"; // Blue
-
-    try {
-      const result = await Tesseract.recognize(
-        file,
-        "eng", // Gunakan bahasa Inggris
-        {
-          logger: function(info) {
-            if (info.status === "recognizing text") {
-              const persen = Math.round(info.progress * 100);
-              elStatus.innerText = "⏳ Membaca... (" + persen + "%)";
-            }
-          }
-        }
-      );
-
-      const teksMentah = result.data.text;
-      
-      // Tampilkan kontainer hasil
-      elHasilContainer.style.display = "block";
-
-      // Ekstrak nomor resi SPX
-      const kandidat = cariNomorResi(teksMentah);
-
-      if (kandidat) {
-        hasilNomor = kandidat;
-        // Tampilkan nomor yang ditemukan dengan jelas, dan teks mentah di bawahnya
-        elHasilText.innerHTML = `
-          <b>${kandidat}</b>
-          <span class="raw-text">${teksMentah.replace(/\n/g, "<br>")}</span>
-        `;
-        elTambahBtn.style.display = "block";
-        elStatus.innerText = "✅ Nomor resi berhasil terdeteksi.";
-        elStatus.style.color = "#16a34a"; // Green
-      } else {
-        elHasilText.innerHTML = `
-          <span style="color:#dc2626; font-weight:600;">Nomor resi tidak ditemukan otomatis.</span>
-          <span class="raw-text">${teksMentah.replace(/\n/g, "<br>")}</span>
-        `;
-        elStatus.innerText = "⚠️ Teks terbaca, tapi format resi tidak cocok.";
-        elStatus.style.color = "#ea580c"; // Orange
-      }
-
-    } catch(error) {
-      console.error(error);
-      elStatus.innerText = "❌ Gagal membaca gambar: " + error.message;
-      elStatus.style.color = "#dc2626"; // Red
+  // FUNGSI INPUT MANUAL (FIXED)
+  function tambahManual() {
+    const elInput = document.getElementById("manualResi");
+    if (!elInput) return;
+    
+    const nilai = elInput.value.trim();
+    if (nilai !== "") {
+      tambahResi(nilai);
+      elInput.value = ""; // Kosongkan input setelah ditambah
+      elInput.focus();
+    } else {
+      alert("Masukkan nomor resi terlebih dahulu.");
     }
   }
 
-  // Regex untuk mencari format SPXID
-  function cariNomorResi(teks) {
-    if (!teks) return null;
-
-    // Bersihkan teks: Uppercase dan hapus spasi berlebih
-    let t = teks.toUpperCase();
-    t = t.replace(/\|/g, "I").replace(/\n+/g, " ").replace(/\s+/g, " ").trim();
-
-    // Prioritas 1: SPXID langsung diikuti angka (Contoh: SPXID012345)
-    let match = t.match(/S\s*P\s*X\s*I\s*D\s*[-: ]*\s*(\d{10,20})/i);
-    if (match) return "SPXID" + match[1];
-
-    // Prioritas 2: Ada kata "SPX" dan "ID" terpisah sedikit
-    match = t.match(/SPX\s*ID\s*[-: ]*\s*(\d{10,20})/i);
-    if (match) return "SPXID" + match[1];
-
-    // Prioritas 3: SPXID dengan noise karakter di antaranya
-    match = t.match(/SPXID[^0-9]{0,10}(\d{10,20})/i);
-    if (match) return "SPXID" + match[1];
-
-    return null;
+  // Fitur Tekan Enter untuk Tambah Manual
+  function handleKeyPress(event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      tambahManual();
+    }
   }
 
-  // Aksi tombol "Tambahkan Nomor Ini"
+  function tambahResi(nomor) {
+    // Format nomor resi ke huruf besar tanpa karakter aneh
+    nomor = String(nomor).toUpperCase().replace(/[^A-Z0-9]/g, "");
+
+    if (!nomor) return;
+
+    if (resi.includes(nomor)) {
+      alert("⚠️ Resi " + nomor + " sudah ada dalam daftar.");
+      return;
+    }
+
+    resi.unshift(nomor); // Tambah ke baris paling atas
+    simpan();
+    tampilkan();
+    
+    elStatus.innerText = "✅ Resi " + nomor + " berhasil ditambahkan.";
+    elStatus.style.color = "#16a34a";
+  }
+
   function gunakanHasil() {
     if (!hasilNomor) return;
     tambahResi(hasilNomor);
     
-    // Reset UI Scanner setelah ditambahkan
     elHasilContainer.style.display = "none";
     elTambahBtn.style.display = "none";
     elFoto.style.display = "none";
@@ -544,36 +441,79 @@
     elStatus.style.color = "#64748b";
   }
 
-  // Aksi tombol "Tambah Manual"
-  function tambahManual() {
-    const elInput = document.getElementById("manualResi");
-    const nilai = elInput.value.trim();
-    if (nilai) {
-      tambahResi(nilai);
-      elInput.value = ""; // Bersihkan input
+  function prosesFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    prosesGambar(file);
+    event.target.value = "";
+  }
+
+  async function prosesGambar(file) {
+    elHasilContainer.style.display = "none";
+    elTambahBtn.style.display = "none";
+    hasilNomor = "";
+
+    elFoto.src = URL.createObjectURL(file);
+    elFoto.style.display = "block";
+
+    elStatus.innerText = "🔍 Sedang membaca tulisan...";
+    elStatus.style.color = "#2563eb";
+
+    try {
+      const result = await Tesseract.recognize(file, "eng", {
+        logger: function(info) {
+          if (info.status === "recognizing text") {
+            const persen = Math.round(info.progress * 100);
+            elStatus.innerText = "⏳ Membaca... (" + persen + "%)";
+          }
+        }
+      });
+
+      const teksMentah = result.data.text;
+      elHasilContainer.style.display = "block";
+
+      const kandidat = cariNomorResi(teksMentah);
+
+      if (kandidat) {
+        hasilNomor = kandidat;
+        elHasilText.innerHTML = `
+          <b>${kandidat}</b>
+          <span class="raw-text">${teksMentah.replace(/\n/g, "<br>")}</span>
+        `;
+        elTambahBtn.style.display = "block";
+        elStatus.innerText = "✅ Nomor resi berhasil terdeteksi.";
+        elStatus.style.color = "#16a34a";
+      } else {
+        elHasilText.innerHTML = `
+          <span style="color:#dc2626; font-weight:600;">Nomor resi tidak terdeteksi otomatis.</span>
+          <span class="raw-text">${teksMentah.replace(/\n/g, "<br>")}</span>
+        `;
+        elStatus.innerText = "⚠️ Teks terbaca, tapi format resi tidak cocok.";
+        elStatus.style.color = "#ea580c";
+      }
+
+    } catch(error) {
+      elStatus.innerText = "❌ Gagal membaca gambar: " + error.message;
+      elStatus.style.color = "#dc2626";
     }
   }
 
-  // Fungsi generik menambah resi ke array dan menyimpannya
-  function tambahResi(nomor) {
-    // Bersihkan nomor: Uppercase, ambil hanya A-Z dan 0-9
-    nomor = String(nomor).toUpperCase().replace(/[^A-Z0-9]/g, "");
+  function cariNomorResi(teks) {
+    if (!teks) return null;
+    let t = teks.toUpperCase().replace(/\|/g, "I").replace(/\n+/g, " ").replace(/\s+/g, " ").trim();
 
-    if (!nomor) return;
+    let match = t.match(/S\s*P\s*X\s*I\s*D\s*[-: ]*\s*(\d{10,20})/i);
+    if (match) return "SPXID" + match[1];
 
-    // Cek Duplikat
-    if (resi.includes(nomor)) {
-      alert("⚠️ Resi " + nomor + " sudah ada dalam daftar.");
-      return;
-    }
+    match = t.match(/SPX\s*ID\s*[-: ]*\s*(\d{10,20})/i);
+    if (match) return "SPXID" + match[1];
 
-    // Masukkan ke array (di awal daftar agar terlihat)
-    resi.unshift(nomor);
-    simpan();
-    tampilkan();
+    match = t.match(/SPXID[^0-9]{0,10}(\d{10,20})/i);
+    if (match) return "SPXID" + match[1];
+
+    return null;
   }
 
-  // Hapus satu resi
   function hapusResi(index) {
     if (confirm("Hapus resi " + resi[index] + "?")) {
       resi.splice(index, 1);
@@ -582,18 +522,17 @@
     }
   }
 
-  // Hapus semua resi (Reset)
   function hapusSemua() {
     if (resi.length === 0) return;
-    if (!confirm("⚠️ Yakin ingin menghapus SEMUA resi yang sudah terrekam?")) return;
+    if (!confirm("⚠️ Yakin ingin menghapus SEMUA resi?")) return;
     resi = [];
     simpan();
     tampilkan();
     elStatus.innerText = "Daftar resi telah dibersihkan.";
+    elStatus.style.color = "#64748b";
   }
 
-  // Kirim data ke Google Apps Script
-  // ✅ GANTI DENGAN KODE BARU KHUSUS AKUN SPX INI:
+  // FUNGSI KIRIM GOOGLE SHEETS
   function kirimSemua() {
     const namaPetugas = elPetugas.value.trim();
 
@@ -612,21 +551,16 @@
 
     const batchId = namaPetugas.toUpperCase().substring(0,3) + "-" + Date.now();
     
-    // ⚠️ GANTI LINK DI BAWAH INI DENGAN URL APPS SCRIPT DARI AKUN WORK SPX KAMU
-    const baseUrl = "https://script.google.com/a/macros/spxexpress.com/s/AKfycbz5eS8WeGfnkHWeLD6AKBjdW78LIWgdH-Tzv_pvzWz9u0MexAOMEIFtfoD9A3RrI42WXw/exec";
-
-    // Menyiapkan parameter data
     const params = new URLSearchParams({
       petugas: namaPetugas,
       batch: batchId,
-      resi: resi.join(","), // Gabungkan daftar resi dengan koma
+      resi: resi.join(","),
       callback: "handleResponse"
     });
 
     elStatus.innerText = "⏳ Sedang mengirim data ke Google Sheets...";
     elStatus.style.color = "#2563eb";
 
-    // Fungsi balikan ketika Google Sheets selesai menyimpan data
     window.handleResponse = function(response) {
       if (response.status === "success") {
         alert("✅ Data berhasil dikirim ke Google Sheets!");
@@ -641,17 +575,15 @@
         elStatus.style.color = "#dc2626";
       }
       
-      // Bersihkan script dinamis setelah selesai
       const scriptEl = document.getElementById("jsonp-script");
       if (scriptEl) scriptEl.remove();
     };
 
-    // Teknik JSONP: Membuat elemen script dinamis untuk tembus blokir akun kantor
     const script = document.createElement("script");
     script.id = "jsonp-script";
-    script.src = baseUrl + "?" + params.toString();
+    script.src = APPS_SCRIPT_URL + "?" + params.toString();
     script.onerror = function() {
-      alert("❌ Gagal terhubung ke Google Sheets. Pastikan URL Apps Script benar dan Deployment diatur ke 'Anyone'.");
+      alert("❌ Gagal terhubung ke Google Sheets. Cek koneksi internet atau URL Apps Script.");
       elStatus.innerText = "❌ Pengiriman gagal.";
       elStatus.style.color = "#dc2626";
     };
@@ -659,54 +591,7 @@
     document.body.appendChild(script);
   }
 
-    if (resi.length === 0) {
-      alert("⚠️ Belum ada resi untuk dikirim.");
-      return;
-    }
-
-    if (!confirm("🚀 Kirim " + resi.length + " resi sekarang?")) return;
-
-    const batchId = namaPetugas.toUpperCase().substring(0,3) + "-" + Date.now();
-    const payload = {
-      petugas: namaPetugas,
-      batch: batchId,
-      resi: resi
-    };
-
-    elStatus.innerText = "⏳ Sedang mengirim data...";
-    elStatus.style.color = "#2563eb";
-
-    try {
-      // Gunakan mode: 'no-cors' jika Apps Script tidak diset untuk CORS, 
-      // tapi ini berarti kita tidak bisa membaca respon sukses/gagal dari server.
-      await fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors", 
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8"
-        },
-        body: JSON.stringify(payload)
-      });
-
-      // Karena no-cors, kita asumsikan sukses jika tidak masuk ke catch block
-      alert("✅ Data berhasil dikirim!");
-      
-      // Bersihkan daftar setelah berhasil kirim
-      resi = [];
-      simpan();
-      tampilkan();
-      elStatus.innerText = "✅ Data berhasil dikirim ke pusat.";
-      elStatus.style.color = "#16a34a";
-
-    } catch(error) {
-      console.error(error);
-      alert("❌ Pengiriman gagal. Coba cek koneksi internet Anda.");
-      elStatus.innerText = "❌ Gagal mengirim data.";
-      elStatus.style.color = "#dc2626";
-    }
-  }
-
-  // --- INISIALISASI AWAL ---
+  // Load Awal
   tampilkan();
 </script>
 
