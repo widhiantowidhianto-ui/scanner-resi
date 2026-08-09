@@ -172,18 +172,6 @@ video {
       <span id="jumlah">0</span> RESI
     </div>
 
-    <button
-      class="green"
-      onclick="bukaKamera()">
-      📷 BUKA KAMERA
-    </button>
-
-    <video
-      id="video"
-      autoplay
-      playsinline>
-    </video>
-
     <label for="kameraInput" class="green tombol">
   📷 FOTO NOMOR RESI
 </label>
@@ -574,7 +562,9 @@ async function prosesGambar(file) {
 
   }
 
-  function cariNomorResi(teks) {
+}
+
+function cariNomorResi(teks) {
 
   if (!teks) return null;
 
@@ -648,67 +638,6 @@ async function prosesGambar(file) {
    */
 
   return null;
-}
-
-  if (!teks) return null;
-
-  const bersih =
-    teks
-      .toUpperCase()
-      .replace(/\s+/g, " ");
-
-  /*
-   * Mencari kandidat alfanumerik panjang.
-   * Kita sengaja tidak langsung mengambil
-   * semua tulisan pada label.
-   */
-
-  const kandidat =
-    bersih.match(
-      /\b[A-Z0-9]{10,30}\b/g
-    );
-
-  if (!kandidat) return null;
-
-  /*
-   * Buang kata-kata umum yang mungkin
-   * terbaca sebagai kandidat.
-   */
-
-  const abaikan = [
-    "INDONESIA",
-    "SHOPEE",
-    "EXPRESS",
-    "CUSTOMER",
-    "SERVICE",
-    "DELIVERY",
-    "ADDRESS",
-    "RECEIVER"
-  ];
-
-  const pilihan =
-    kandidat.filter(function(x) {
-
-      return !abaikan.includes(x);
-
-    });
-
-  if (pilihan.length === 0) {
-    return null;
-  }
-
-  /*
-   * Ambil kandidat terpanjang.
-   */
-
-  pilihan.sort(function(a, b) {
-
-    return b.length - a.length;
-
-  });
-
-  return pilihan[0];
-
 }
 
 function gunakanHasil() {
