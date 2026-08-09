@@ -64,6 +64,7 @@
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       text-align: left;
       font-family: monospace;
+      word-break: break-all;
     }
   </style>
 </head>
@@ -80,7 +81,7 @@
           </div>
           <div>
             <p class="text-lg sm:text-2xl font-black text-white tracking-wide flex items-center gap-2">
-              Scanner Resi OCR <span class="bg-gradient-to-r from-amber-400 to-amber-500 text-black font-extrabold px-2 py-0.5 rounded-md text-xs shadow-md">Pro v3</span>
+              Scanner Resi OCR <span class="bg-gradient-to-r from-amber-400 to-amber-500 text-black font-extrabold px-2 py-0.5 rounded-md text-xs shadow-md">Pro v3.1</span>
             </p>
             <p class="text-xs sm:text-sm text-gray-300">Scan • Auto Enhancement • Auto Sync</p>
           </div>
@@ -172,7 +173,7 @@
           <input id="galeriInput" type="file" accept="image/*" style="display:none" onchange="prosesFile(event)">
         </div>
 
-        <!-- Element Image & Canvas Tersembunyi untuk Image Processing -->
+        <!-- Element Preview Gambar -->
         <img id="foto" alt="Preview Resi" class="w-full max-h-80 object-contain rounded-2xl border-2 border-dashed border-red-500/30 hidden bg-slate-900/90 p-2">
         <canvas id="procCanvas" style="display:none;"></canvas>
 
@@ -320,7 +321,7 @@
     </div>
   </nav>
 
-  <!-- ================= LOGIC & OCR ENGINE STABLE ================= -->
+  <!-- ================= LOGIC & OCR ENGINE FIXED ================= -->
   <script>
     const APPS_SCRIPT_URL = "https://script.google.com/a/macros/spxexpress.com/s/AKfycbyES7UK3oV0nDdccdfp3Rl0nj3IVmb4gY0zbT9aL2ijsD8rLAOHtrGcZOyP3gYdTllC2w/exec";
 
@@ -409,7 +410,7 @@
       elTambahBtn.style.display = "none";
       hasilNomor = "";
 
-      elStatus.innerText = "⏳ Mengoptimalkan gambar resi...";
+      elStatus.innerText = "⏳ Mengolah & membaca gambar resi...";
       elStatus.className = "glass-card rounded-2xl p-4 text-center text-xs sm:text-sm font-bold text-blue-400 border border-blue-500/40 w-full";
 
       const reader = new FileReader();
@@ -419,11 +420,8 @@
           elFoto.src = e.target.result;
           elFoto.classList.remove("hidden");
 
-          // Jalankan Pre-processing Gambar (Grayscale + Thresholding Kontras)
-          const cleanCanvas = tingkatkanKontrasGambar(img);
-          
-          // Jalankan Tesseract Engine
-          jalankanTesseract(cleanCanvas);
+          // Jalankan Tesseract dengan Fallback multi-stage
+          jalankanTesseractProcess(img);
         };
         img.src = e.target.result;
       };
@@ -432,14 +430,13 @@
       event.target.value = "";
     }
 
-    // Algoritma Image Pre-processing (Konversi ke Monokrom Hitam-Putih Tajam)
-    function tingkatkanKontrasGambar(img) {
+    // Canvas Processing yang Aman (Mencegah Corrupt Alpha)
+    function siapkanCanvas(img) {
       const ctx = elCanvas.getContext("2d");
       
-      // Limit resolusi maksimum agar proses OCR cepat di HP
-      const maxDim = 1200;
       let width = img.width;
       let height = img.height;
+      const maxDim = 1200;
 
       if (width > maxDim || height > maxDim) {
         if (width > height) {
@@ -454,21 +451,22 @@
       elCanvas.width = width;
       elCanvas.height = height;
 
+      // Fill background putih solid dulu
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillRect(0, 0, width, height);
       ctx.drawImage(img, 0, 0, width, height);
 
-      // Ambil data piksel
+      // Tingkatkan Kontras Hitam Putih
       const imgData = ctx.getImageData(0, 0, width, height);
       const d = imgData.data;
 
-      // Konversi ke Grayscale & Binarization (Thresholding)
       for (let i = 0; i < d.length; i += 4) {
-        // R, G, B ke Grayscale
-        const avg = 0.2126 * d[i] + 0.7152 * d[i+1] + 0.0722 * d[i+2];
-        // Binarization sederhana (Hitam/Putih tajam)
-        const v = avg > 130 ? 255 : 0;
+        const avg = 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
+        const v = avg > 125 ? 255 : 0;
         d[i] = v;     // R
         d[i+1] = v;   // G
         d[i+2] = v;   // B
+        d[i+3] = 255; // Alpha HARUS 255 (Mencegah merah/transparan)
       }
 
       ctx.putImageData(imgData, 0, 0);
@@ -476,31 +474,33 @@
     }
 
     // Engine Tesseract
-    async function jalankanTesseract(canvasElement) {
-      elStatus.innerText = "⏳ Membaca Teks OCR...";
-
+    async function jalankanTesseractProcess(imgElement) {
       try {
         const worker = await Tesseract.createWorker("eng");
-        
-        // Optimasi Tesseract hanya fokus pada Huruf Kapital & Angka
-        await worker.setParameters({
-          tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-",
-        });
 
-        const ret = await worker.recognize(canvasElement);
+        // Tahap 1: Coba dengan Gambar Asli dulu
+        let ret = await worker.recognize(imgElement);
+        let teks = ret.data.text || "";
+        let kandidat = cariNomorResi(teks);
+
+        // Tahap 2: Jika Gambar Asli gagal, gunakan Canvas Pre-processing
+        if (!kandidat) {
+          const procCanvas = siapkanCanvas(imgElement);
+          ret = await worker.recognize(procCanvas);
+          teks = ret.data.text || "";
+          kandidat = cariNomorResi(teks);
+        }
+
         await worker.terminate();
 
-        const teksMentah = ret.data.text;
         elHasilContainer.classList.remove("hidden");
-
-        const kandidat = cariNomorResi(teksMentah);
 
         if (kandidat) {
           hasilNomor = kandidat;
           elHasilText.innerHTML = `
             <div class="text-xl font-black text-red-400 tracking-wider">${kandidat}</div>
             <div class="text-xs text-emerald-400 font-bold my-1"><i class="fa-solid fa-circle-check"></i> Nomor resi terdeteksi!</div>
-            <span class="raw-text">${teksMentah.replace(/\n/g, " ")}</span>
+            <span class="raw-text">Teks terbaca: ${teks.replace(/\n/g, " ")}</span>
           `;
           elTambahBtn.style.display = "flex";
           elStatus.innerText = "✅ Resi terdeteksi!";
@@ -508,7 +508,7 @@
         } else {
           elHasilText.innerHTML = `
             <span class="text-xs text-red-400 font-bold">Nomor resi SPXID tidak terdeteksi otomatis.</span>
-            <span class="raw-text">Teks terbaca: ${teksMentah || "Kosong"}</span>
+            <span class="raw-text">Teks terbaca: ${teks.trim() || "Kosong"}</span>
           `;
           elStatus.innerText = "⚠️ Format SPXID tidak ditemukan pada gambar.";
           elStatus.className = "glass-card rounded-2xl p-4 text-center text-xs sm:text-sm font-bold text-amber-400 border border-amber-500/40 w-full";
@@ -521,28 +521,29 @@
       }
     }
 
-    // Regex SPX Detektor Pintar (Toleransi Kesalahan Baca OCR)
+    // Detektor Regex Pintar
     function cariNomorResi(teks) {
       if (!teks) return null;
       
-      // Bersihkan karakter aneh
+      // Bersihkan teks & ubah karakter keliru yang sering muncul di OCR
       let t = teks.toUpperCase()
+                  .replace(/[\r\n\t]/g, "")
+                  .replace(/\s+/g, "")
                   .replace(/\|/g, "I")
                   .replace(/0PX/g, "SPX")
-                  .replace(/5PX/g, "SPX")
-                  .replace(/\s+/g, "");
+                  .replace(/5PX/g, "SPX");
 
-      // Match Standard: SPXID diikuti 10-15 digit angka
+      // Match 1: SPXID diikuti 10-15 angka
       let match = t.match(/SPXID(\d{10,15})/);
       if (match) return "SPXID" + match[1];
 
-      // Match Alternatif jika huruf ID terbaca 1D / IO
-      match = t.match(/SPX(ID|1D|IO|D)(\d{10,15})/);
+      // Match 2: SPX + (ID/1D/IO/D/L) + Angka
+      match = t.match(/SPX(ID|1D|IO|D|L)(\d{10,15})/);
       if (match) return "SPXID" + match[2];
 
-      // Match jika ada pemisah strip (-)
-      match = t.match(/SPXID-(\d{10,15})/);
-      if (match) return "SPXID" + match[1];
+      // Match 3: Cuma nemu deretan 10-12 digit angka SPX (misal kata SPXID-nya terpotong)
+      match = t.match(/(\d{10,14})/);
+      if (match && t.includes("SPX")) return "SPXID" + match[1];
 
       return null;
     }
