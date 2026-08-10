@@ -5,17 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SPX Express - Scanner Resi OCR Pro v5.0</title>
 
-  <!-- Library ZXing (Detector Barcode/QR Super Cepat & Akurat) -->
+  <!-- Library ZXing -->
   <script src="https://unpkg.com/@zxing/library@latest"></script>
   <!-- Library Tesseract OCR -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
-  <!-- Google Font & Font Awesome untuk Ikon -->
+  <!-- Google Font & Font Awesome -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
-    /* Reset & CSS Variables */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -42,7 +41,6 @@
       justify-content: center;
     }
 
-    /* App Container (Mobile Frame Constraint) */
     .app-container {
       width: 100%;
       max-width: 480px;
@@ -50,7 +48,6 @@
       padding: 0 16px;
     }
 
-    /* HEADER SECTION */
     .header {
       padding: 20px 0 10px 0;
       color: white;
@@ -137,7 +134,6 @@
       backdrop-filter: blur(4px);
     }
 
-    /* CARD SYSTEM */
     .card {
       background: white;
       border-radius: 16px;
@@ -147,7 +143,6 @@
       position: relative;
     }
 
-    /* Card: Petugas */
     .field-label {
       font-size: 11px;
       font-weight: 700;
@@ -187,7 +182,6 @@
       font-size: 18px;
     }
 
-    /* Card: Counter */
     .counter-card {
       display: flex;
       align-items: center;
@@ -255,7 +249,6 @@
       height: auto;
     }
 
-    /* BUTTON ACTION GRID */
     .action-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -326,7 +319,6 @@
       opacity: 0.7;
     }
 
-    /* PREVIEW & HASIL SCAN */
     #foto {
       width: 100%;
       max-height: 220px;
@@ -409,7 +401,6 @@
       border-top: 1px dashed #bbf7d0;
     }
 
-    /* BUTTON TAMBAHKAN NOMOR */
     .btn-submit {
       width: 100%;
       background: linear-gradient(135deg, #e60000 0%, #b80000 100%);
@@ -454,7 +445,6 @@
       font-size: 12px;
     }
 
-    /* INPUT MANUAL */
     .manual-card {
       padding: 12px 16px;
     }
@@ -494,7 +484,6 @@
       gap: 4px;
     }
 
-    /* DAFTAR RESI */
     .resi-list-card {
       padding: 16px;
     }
@@ -561,7 +550,6 @@
       font-weight: 500;
     }
 
-    /* BOTTON ACTION BULK */
     .bulk-action-group {
       display: flex;
       flex-direction: column;
@@ -594,7 +582,6 @@
       cursor: pointer;
     }
 
-    /* STATS SUMMARY ROW */
     .stats-row {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -636,7 +623,6 @@
       color: var(--text-dark);
     }
 
-    /* BOTTOM NAVBAR */
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -698,7 +684,7 @@
 
 <div class="app-container">
 
-  <!-- HEADER SECTION -->
+  <!-- HEADER -->
   <div class="header">
     <div class="header-top">
       <div>
@@ -906,7 +892,14 @@
   const APPS_SCRIPT_URL = "https://script.google.com/a/macros/spxexpress.com/s/AKfycbzMwkx6yYYu63IHNDiwKl7GwXggLjJSEOOhA-dFlKIOyjW0QzHquJ3iQFDdc8JHrm9hAw/exec";
   
   let hasilNomor = "";
-  let resi = JSON.parse(localStorage.getItem("scanner_resi") || "[]");
+  let resi = [];
+
+  // Proteksi parsing LocalStorage jika terjadi korupsi data
+  try {
+    resi = JSON.parse(localStorage.getItem("scanner_resi") || "[]");
+  } catch(e) {
+    resi = [];
+  }
 
   const elStatus = document.getElementById("status");
   const elFoto = document.getElementById("foto");
@@ -920,16 +913,19 @@
   const elJumlahMini = document.getElementById("jumlahMini");
   const elStatResi = document.getElementById("statResiHariIni");
 
-  elPetugas.value = localStorage.getItem("scanner_petugas") || "";
-  elPetugas.addEventListener("input", function() {
-    localStorage.setItem("scanner_petugas", elPetugas.value);
-  });
+  if (elPetugas) {
+    elPetugas.value = localStorage.getItem("scanner_petugas") || "";
+    elPetugas.addEventListener("input", function() {
+      localStorage.setItem("scanner_petugas", elPetugas.value);
+    });
+  }
 
   function tampilkan() {
-    elJumlah.innerText = resi.length;
+    if (elJumlah) elJumlah.innerText = resi.length;
     if (elJumlahMini) elJumlahMini.innerText = resi.length;
     if (elStatResi) elStatResi.innerText = resi.length;
 
+    if (!elDaftar) return;
     elDaftar.innerHTML = "";
 
     if (resi.length === 0) {
@@ -959,19 +955,23 @@
     const file = event.target.files[0];
     if (!file) return;
 
-    elHasilContainer.style.display = "none";
-    elTambahBtn.style.display = "none";
+    if (elHasilContainer) elHasilContainer.style.display = "none";
+    if (elTambahBtn) elTambahBtn.style.display = "none";
     hasilNomor = "";
 
     const reader = new FileReader();
     reader.onload = function(e) {
       const img = new Image();
       img.onload = async function() {
-        elFoto.src = e.target.result;
-        elFoto.style.display = "block";
+        if (elFoto) {
+          elFoto.src = e.target.result;
+          elFoto.style.display = "block";
+        }
 
-        elStatus.innerText = "⚡ Menjalankan Pemindaian...";
-        elStatus.style.color = "#2563eb";
+        if (elStatus) {
+          elStatus.innerText = "⚡ Menjalankan Pemindaian...";
+          elStatus.style.color = "#2563eb";
+        }
 
         await prosesMultiEngine(img, e.target.result);
       };
@@ -981,26 +981,33 @@
     event.target.value = "";
   }
 
-  // Dual Engine: Barcode Scanner -> OCR
   async function prosesMultiEngine(imgElement, dataUrl) {
+    // Stage 1: Barcode Reader (ZXing)
     try {
-      const codeReader = new ZXing.BrowserMultiFormatReader();
-      const result = await codeReader.decodeFromImageUrl(dataUrl);
+      if (typeof ZXing !== "undefined") {
+        const codeReader = new ZXing.BrowserMultiFormatReader();
+        const result = await codeReader.decodeFromImageUrl(dataUrl);
 
-      if (result && result.text) {
-        const kandidatBarcode = cariNomorResi(result.text);
-        if (kandidatBarcode) {
-          tampilkanSukses(kandidatBarcode, "Barcode Reader", result.text);
-          return;
+        if (result && result.text) {
+          const kandidatBarcode = cariNomorResi(result.text);
+          if (kandidatBarcode) {
+            tampilkanSukses(kandidatBarcode, "Barcode Reader", result.text);
+            return;
+          }
         }
       }
     } catch (e) {
-      console.log("Stage 1 (Barcode) tidak menemukan barcode, lanjut ke Stage 2 (OCR)...");
+      console.log("ZXing melewatinya, berpindah ke OCR Engine...");
     }
 
+    // Stage 2: OCR Engine (Tesseract.js)
     try {
-      elStatus.innerText = "⏳ Membaca Teks Resi (OCR)...";
+      if (elStatus) elStatus.innerText = "⏳ Membaca Teks Resi (OCR)...";
       
+      if (typeof Tesseract === "undefined") {
+        throw new Error("Library Tesseract belum termuat. Periksa koneksi internet.");
+      }
+
       const worker = await Tesseract.createWorker("eng");
       await worker.setParameters({
         tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
@@ -1015,33 +1022,43 @@
       if (kandidatOCR) {
         tampilkanSukses(kandidatOCR, "OCR Engine", teksMentah);
       } else {
-        elHasilContainer.style.display = "block";
-        elHasilText.innerHTML = `
-          <div style="color:#dc2626; font-weight:800; font-size: 13px;">Nomor resi SPXID tidak terdeteksi.</div>
-          <span class="raw-text">${teksMentah.replace(/\n/g, "<br>") || "Gambar tidak terbaca"}</span>
-        `;
-        elStatus.innerText = "⚠️ Format SPXID tidak terdeteksi otomatis.";
-        elStatus.style.color = "#ea580c";
+        if (elHasilContainer) elHasilContainer.style.display = "block";
+        if (elHasilText) {
+          elHasilText.innerHTML = `
+            <div style="color:#dc2626; font-weight:800; font-size: 13px;">Nomor resi SPXID tidak terdeteksi.</div>
+            <span class="raw-text">${teksMentah.replace(/\n/g, "<br>") || "Gambar tidak terbaca"}</span>
+          `;
+        }
+        if (elStatus) {
+          elStatus.innerText = "⚠️ Format SPXID tidak terdeteksi otomatis.";
+          elStatus.style.color = "#ea580c";
+        }
       }
 
     } catch (err) {
       console.error(err);
-      elStatus.innerText = "❌ Gagal memproses gambar: " + err.message;
-      elStatus.style.color = "#dc2626";
+      if (elStatus) {
+        elStatus.innerText = "❌ Gagal memproses gambar: " + err.message;
+        elStatus.style.color = "#dc2626";
+      }
     }
   }
 
   function tampilkanSukses(nomor, metode, teksMentah) {
     hasilNomor = nomor;
-    elHasilContainer.style.display = "block";
-    elHasilText.innerHTML = `
-      <div style="font-size:16px; font-weight:900; color:#278927;">${nomor}</div>
-      <span style="font-size:10px; color:#278927; font-weight:700;">Terdeteksi via ${metode}</span>
-      <span class="raw-text">${teksMentah.replace(/\n/g, "<br>")}</span>
-    `;
-    elTambahBtn.style.display = "flex";
-    elStatus.innerText = "✅ Nomor resi berhasil terdeteksi.";
-    elStatus.style.color = "#16a34a";
+    if (elHasilContainer) elHasilContainer.style.display = "block";
+    if (elHasilText) {
+      elHasilText.innerHTML = `
+        <div style="font-size:16px; font-weight:900; color:#278927;">${nomor}</div>
+        <span style="font-size:10px; color:#278927; font-weight:700;">Terdeteksi via ${metode}</span>
+        <span class="raw-text">${teksMentah.replace(/\n/g, "<br>")}</span>
+      `;
+    }
+    if (elTambahBtn) elTambahBtn.style.display = "flex";
+    if (elStatus) {
+      elStatus.innerText = "✅ Nomor resi berhasil terdeteksi.";
+      elStatus.style.color = "#16a34a";
+    }
   }
 
   function cariNomorResi(teks) {
@@ -1068,15 +1085,18 @@
     if (!hasilNomor) return;
     tambahResi(hasilNomor);
     
-    elHasilContainer.style.display = "none";
-    elTambahBtn.style.display = "none";
-    elFoto.style.display = "none";
-    elStatus.innerText = "Siap untuk scan berikutnya.";
-    elStatus.style.color = "#718096";
+    if (elHasilContainer) elHasilContainer.style.display = "none";
+    if (elTambahBtn) elTambahBtn.style.display = "none";
+    if (elFoto) elFoto.style.display = "none";
+    if (elStatus) {
+      elStatus.innerText = "Siap untuk scan berikutnya.";
+      elStatus.style.color = "#718096";
+    }
   }
 
   function tambahManual() {
     const elInput = document.getElementById("manualResi");
+    if (!elInput) return;
     const nilai = elInput.value.trim();
     if (nilai) {
       tambahResi(nilai);
@@ -1113,15 +1133,15 @@
     resi = [];
     simpan();
     tampilkan();
-    elStatus.innerText = "Daftar resi telah dibersihkan.";
+    if (elStatus) elStatus.innerText = "Daftar resi telah dibersihkan.";
   }
 
   async function kirimSemua() {
-    const namaPetugas = elPetugas.value.trim();
+    const namaPetugas = elPetugas ? elPetugas.value.trim() : "";
 
     if (!namaPetugas) {
       alert("⚠️ Harap masukkan Nama Petugas terlebih dahulu.");
-      elPetugas.focus();
+      if (elPetugas) elPetugas.focus();
       return;
     }
 
@@ -1139,8 +1159,10 @@
       resi: resi
     };
 
-    elStatus.innerText = "⏳ Sedang mengirim data...";
-    elStatus.style.color = "#2563eb";
+    if (elStatus) {
+      elStatus.innerText = "⏳ Sedang mengirim data...";
+      elStatus.style.color = "#2563eb";
+    }
 
     try {
       await fetch(APPS_SCRIPT_URL, {
@@ -1156,18 +1178,25 @@
       resi = [];
       simpan();
       tampilkan();
-      elStatus.innerText = "✅ Data berhasil dikirim ke pusat.";
-      elStatus.style.color = "#16a34a";
+      if (elStatus) {
+        elStatus.innerText = "✅ Data berhasil dikirim ke pusat.";
+        elStatus.style.color = "#16a34a";
+      }
 
     } catch(error) {
       console.error(error);
       alert("❌ Pengiriman gagal. Coba cek koneksi internet Anda.");
-      elStatus.innerText = "❌ Gagal mengirim data.";
-      elStatus.style.color = "#dc2626";
+      if (elStatus) {
+        elStatus.innerText = "❌ Gagal mengirim data.";
+        elStatus.style.color = "#dc2626";
+      }
     }
   }
 
-  tampilkan();
+  // Jalankan saat halaman siap
+  document.addEventListener("DOMContentLoaded", function() {
+    tampilkan();
+  });
 </script>
 
 </body>
