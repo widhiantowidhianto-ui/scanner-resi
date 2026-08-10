@@ -5,11 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SPX OCR SCANNER PRO v5.0</title>
 
-  <!-- Library ZXing (Detector Barcode/QR Super Cepat & Akurat) -->
-  <script src="https://unpkg.com/@zxing/library@latest"></script>
-  <!-- Library Tesseract OCR -->
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-
   <style>
     /* Reset & Base Styles */
     * {
@@ -153,7 +148,6 @@
     /* Area Hasil OCR */
     .hasil-container {
       margin-top: 15px;
-      display: none;
     }
 
     .hasil-box {
@@ -284,13 +278,6 @@
       font-weight: 500;
       border: 1px solid #e2e8f0;
     }
-
-    .empty-state {
-      text-align: center;
-      color: #94a3b8;
-      padding: 20px 0;
-      font-size: 14px;
-    }
   </style>
 </head>
 
@@ -305,45 +292,41 @@
   <!-- Identitas Petugas -->
   <div class="card">
     <label class="title" for="petugas">👤 Nama Petugas / Kurir</label>
-    <input id="petugas" type="text" placeholder="Contoh: Dhian Purnomo" autocomplete="off">
+    <input id="petugas" type="text" placeholder="Contoh: Dhian Purnomo" value="Dhian Purnomo" autocomplete="off">
   </div>
 
   <!-- Area Pindaian -->
   <div class="card">
     <div class="total-container">
       <div class="total-label">Resi Terrekam</div>
-      <div class="total-number"><span id="jumlah">0</span></div>
+      <div class="total-number"><span>2</span></div>
     </div>
 
     <div class="button-group">
-      <label for="kameraInput" class="tombol-btn btn-main">
+      <label class="tombol-btn btn-main">
         📷 AMBIL FOTO RESI
       </label>
-      <input id="kameraInput" type="file" accept="image/*" capture="environment" style="display:none" onchange="prosesFile(event)">
 
-      <label for="galeriInput" class="tombol-btn btn-secondary">
+      <label class="tombol-btn btn-secondary">
         🖼️ PILIH DARI GALERI
       </label>
-      <input id="galeriInput" type="file" accept="image/*" style="display:none" onchange="prosesFile(event)">
     </div>
-
-    <!-- Preview Foto Asli (Tanpa Efek Rusak) -->
-    <img id="foto" alt="Preview Resi">
-    <canvas id="procCanvas" style="display:none;"></canvas>
 
     <!-- Status Pembacaan -->
-    <div id="status" class="status-bar">
-      Siap. Ambil foto resi untuk mulai membaca.
+    <div class="status-bar" style="color: #16a34a;">
+      ✅ Nomor resi berhasil terdeteksi.
     </div>
 
-    <!-- Hasil Pindaian -->
-    <div id="hasil" class="hasil-container">
+    <!-- Contoh Tampilan Hasil Pindaian -->
+    <div class="hasil-container">
       <div class="hasil-box">
         <div class="card-title">🔍 Hasil Deteksi Otomatis:</div>
-        <div id="hasilText"></div>
+        <b>SPXID03291823712</b>
+        <span style="font-size:11px; color:#16a34a; font-weight:bold;">Terdeteksi via Barcode Reader</span>
+        <span class="raw-text">RAW OCR: SPXID03291823712 STANDARD DELIVERY</span>
       </div>
       
-      <button id="tambahBtn" class="btn-main" style="display:none; margin-top:12px" onclick="gunakanHasil()">
+      <button class="btn-main" style="margin-top:12px">
         ✅ TAMBAHKAN NOMOR INI
       </button>
     </div>
@@ -353,297 +336,41 @@
   <div class="card">
     <div class="card-title">⌨️ Input Resi Manual</div>
     <div class="input-manual-bar">
-      <input id="manualResi" type="text" placeholder="Masukkan SPXID...">
-      <button class="btn-action" onclick="tambahManual()">+ Tambah</button>
+      <input type="text" placeholder="Masukkan SPXID...">
+      <button class="btn-action">+ Tambah</button>
     </div>
   </div>
 
-  <!-- Daftar Resi -->
+  <!-- Daftar Resi Contoh Dummy -->
   <div class="card">
     <div class="card-title">📄 Daftar Resi</div>
-    <div id="daftar"></div>
+    <div id="daftar">
+      <div class="resi-item">
+        <div class="resi-info">
+          <span class="resi-number-tag">1.</span>
+          <span class="resi-value">SPXID03291823712</span>
+        </div>
+        <button class="btn-danger">Hapus</button>
+      </div>
+      <div class="resi-item">
+        <div class="resi-info">
+          <span class="resi-number-tag">2.</span>
+          <span class="resi-value">SPXID03982310111</span>
+        </div>
+        <button class="btn-danger">Hapus</button>
+      </div>
+    </div>
   </div>
 
   <!-- Aksi Kirim/Hapus -->
   <div class="card" style="background-color: transparent; box-shadow: none; border: none; padding: 0;">
     <div class="button-group">
-      <button class="btn-action" onclick="kirimSemua()">🚀 KIRIM SEMUA RESI</button>
-      <button class="btn-danger" onclick="hapusSemua()">🗑️ HAPUS SEMUA</button>
+      <button class="btn-action">🚀 KIRIM SEMUA RESI</button>
+      <button class="btn-danger">🗑️ HAPUS SEMUA</button>
     </div>
   </div>
 
 </div>
-
-<script>
-  const APPS_SCRIPT_URL = "https://script.google.com/a/macros/spxexpress.com/s/AKfycbzMwkx6yYYu63IHNDiwKl7GwXggLjJSEOOhA-dFlKIOyjW0QzHquJ3iQFDdc8JHrm9hAw/exec";
-  
-  let hasilNomor = "";
-  let resi = JSON.parse(localStorage.getItem("scanner_resi") || "[]");
-
-  const elStatus = document.getElementById("status");
-  const elFoto = document.getElementById("foto");
-  const elCanvas = document.getElementById("procCanvas");
-  const elHasilContainer = document.getElementById("hasil");
-  const elHasilText = document.getElementById("hasilText");
-  const elTambahBtn = document.getElementById("tambahBtn");
-  const elPetugas = document.getElementById("petugas");
-  const elDaftar = document.getElementById("daftar");
-  const elJumlah = document.getElementById("jumlah");
-
-  elPetugas.value = localStorage.getItem("scanner_petugas") || "";
-  elPetugas.addEventListener("input", function() {
-    localStorage.setItem("scanner_petugas", elPetugas.value);
-  });
-
-  function tampilkan() {
-    elJumlah.innerText = resi.length;
-    elDaftar.innerHTML = "";
-
-    if (resi.length === 0) {
-      elDaftar.innerHTML = "<div class='empty-state'>Belum ada resi yang ditambahkan.</div>";
-      return;
-    }
-
-    resi.forEach(function(nomor, index) {
-      const divItem = document.createElement("div");
-      divItem.className = "resi-item";
-      divItem.innerHTML = `
-        <div class="resi-info">
-          <span class="resi-number-tag">${index + 1}.</span>
-          <span class="resi-value">${nomor}</span>
-        </div>
-        <button class="btn-danger" onclick="hapusResi(${index})">Hapus</button>
-      `;
-      elDaftar.appendChild(divItem);
-    });
-  }
-
-  function simpan() {
-    localStorage.setItem("scanner_resi", JSON.stringify(resi));
-  }
-
-  function prosesFile(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    elHasilContainer.style.display = "none";
-    elTambahBtn.style.display = "none";
-    hasilNomor = "";
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const img = new Image();
-      img.onload = async function() {
-        elFoto.src = e.target.result;
-        elFoto.style.display = "block";
-
-        elStatus.innerText = "⚡ Menjalankan Pemindaian...";
-        elStatus.style.color = "#2563eb";
-
-        // Jalankan sistem pembaca ganda
-        await prosesMultiEngine(img, e.target.result);
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-    event.target.value = "";
-  }
-
-  // Dual Engine: Barcode Scanner -> OCR
-  async function prosesMultiEngine(imgElement, dataUrl) {
-    // Stage 1: Coba scan barcode resi via ZXing (Instan & Sangat Akurat)
-    try {
-      const codeReader = new ZXing.BrowserMultiFormatReader();
-      const result = await codeReader.decodeFromImageUrl(dataUrl);
-
-      if (result && result.text) {
-        const kandidatBarcode = cariNomorResi(result.text);
-        if (kandidatBarcode) {
-          tampilkanSukses(kandidatBarcode, "Barcode Reader", result.text);
-          return;
-        }
-      }
-    } catch (e) {
-      console.log("Stage 1 (Barcode) tidak menemukan barcode, lanjut ke Stage 2 (OCR)...");
-    }
-
-    // Stage 2: Fallback ke Tesseract OCR dengan Mode Single Line
-    try {
-      elStatus.innerText = "⏳ Membaca Teks Resi (OCR)...";
-      
-      const worker = await Tesseract.createWorker("eng");
-      await worker.setParameters({
-        tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
-      });
-
-      const ret = await worker.recognize(imgElement);
-      await worker.terminate();
-
-      const teksMentah = ret.data.text || "";
-      const kandidatOCR = cariNomorResi(teksMentah);
-
-      if (kandidatOCR) {
-        tampilkanSukses(kandidatOCR, "OCR Engine", teksMentah);
-      } else {
-        elHasilContainer.style.display = "block";
-        elHasilText.innerHTML = `
-          <span style="color:#dc2626; font-weight:600;">Nomor resi SPXID tidak terdeteksi.</span>
-          <span class="raw-text">${teksMentah.replace(/\n/g, "<br>") || "Gambar tidak terbaca"}</span>
-        `;
-        elStatus.innerText = "⚠️ Format SPXID tidak terdeteksi otomatis.";
-        elStatus.style.color = "#ea580c";
-      }
-
-    } catch (err) {
-      console.error(err);
-      elStatus.innerText = "❌ Gagal memproses gambar: " + err.message;
-      elStatus.style.color = "#dc2626";
-    }
-  }
-
-  function tampilkanSukses(nomor, metode, teksMentah) {
-    hasilNomor = nomor;
-    elHasilContainer.style.display = "block";
-    elHasilText.innerHTML = `
-      <b>${nomor}</b>
-      <span style="font-size:11px; color:#16a34a; font-weight:bold;">Terdeteksi via ${metode}</span>
-      <span class="raw-text">${teksMentah.replace(/\n/g, "<br>")}</span>
-    `;
-    elTambahBtn.style.display = "block";
-    elStatus.innerText = "✅ Nomor resi berhasil terdeteksi.";
-    elStatus.style.color = "#16a34a";
-  }
-
-  // Regex Pintar untuk Menangkap Berbagai Variasi SPXID
-  function cariNomorResi(teks) {
-    if (!teks) return null;
-
-    let t = teks.toUpperCase().replace(/[\r\n\t]/g, " ").replace(/\s+/g, "");
-
-    // 1. SPXID diikuti 10-15 digit angka
-    let match = t.match(/SPXID(\d{10,15})/);
-    if (match) return "SPXID" + match[1];
-
-    // 2. SPXID terpisah spos/simbol
-    match = t.match(/S\s*P\s*X\s*I\s*D\s*[-:]*\s*(\d{10,15})/);
-    if (match) return "SPXID" + match[1];
-
-    // 3. Karakter mirip (misal IO/1D/D terjemahan dari ID)
-    match = t.match(/SPX(ID|1D|IO|D|L)(\d{10,15})/);
-    if (match) return "SPXID" + match[2];
-
-    // 4. Deretan 10-14 angka jika ada kata SPX
-    match = t.match(/(\d{10,14})/);
-    if (match && t.includes("SPX")) return "SPXID" + match[1];
-
-    return null;
-  }
-
-  function gunakanHasil() {
-    if (!hasilNomor) return;
-    tambahResi(hasilNomor);
-    
-    elHasilContainer.style.display = "none";
-    elTambahBtn.style.display = "none";
-    elFoto.style.display = "none";
-    elStatus.innerText = "Siap untuk scan berikutnya.";
-    elStatus.style.color = "#64748b";
-  }
-
-  function tambahManual() {
-    const elInput = document.getElementById("manualResi");
-    const nilai = elInput.value.trim();
-    if (nilai) {
-      tambahResi(nilai);
-      elInput.value = "";
-    }
-  }
-
-  function tambahResi(nomor) {
-    nomor = String(nomor).toUpperCase().replace(/[^A-Z0-9]/g, "");
-
-    if (!nomor) return;
-
-    if (resi.includes(nomor)) {
-      alert("⚠️ Resi " + nomor + " sudah ada dalam daftar.");
-      return;
-    }
-
-    resi.unshift(nomor);
-    simpan();
-    tampilkan();
-  }
-
-  function hapusResi(index) {
-    if (confirm("Hapus resi " + resi[index] + "?")) {
-      resi.splice(index, 1);
-      simpan();
-      tampilkan();
-    }
-  }
-
-  function hapusSemua() {
-    if (resi.length === 0) return;
-    if (!confirm("⚠️ Yakin ingin menghapus SEMUA resi?")) return;
-    resi = [];
-    simpan();
-    tampilkan();
-    elStatus.innerText = "Daftar resi telah dibersihkan.";
-  }
-
-  async function kirimSemua() {
-    const namaPetugas = elPetugas.value.trim();
-
-    if (!namaPetugas) {
-      alert("⚠️ Harap masukkan Nama Petugas terlebih dahulu.");
-      elPetugas.focus();
-      return;
-    }
-
-    if (resi.length === 0) {
-      alert("⚠️ Belum ada resi untuk dikirim.");
-      return;
-    }
-
-    if (!confirm("🚀 Kirim " + resi.length + " resi sekarang?")) return;
-
-    const batchId = namaPetugas.toUpperCase().substring(0,3) + "-" + Date.now();
-    const payload = {
-      petugas: namaPetugas,
-      batch: batchId,
-      resi: resi
-    };
-
-    elStatus.innerText = "⏳ Sedang mengirim data...";
-    elStatus.style.color = "#2563eb";
-
-    try {
-      await fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors", 
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8"
-        },
-        body: JSON.stringify(payload)
-      });
-
-      alert("✅ Data berhasil dikirim!");
-      resi = [];
-      simpan();
-      tampilkan();
-      elStatus.innerText = "✅ Data berhasil dikirim ke pusat.";
-      elStatus.style.color = "#16a34a";
-
-    } catch(error) {
-      console.error(error);
-      alert("❌ Pengiriman gagal. Coba cek koneksi internet Anda.");
-      elStatus.innerText = "❌ Gagal mengirim data.";
-      elStatus.style.color = "#dc2626";
-    }
-  }
-
-  tampilkan();
-</script>
 
 </body>
 </html>
