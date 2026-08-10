@@ -3,371 +3,818 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SPX OCR SCANNER PRO v5.0</title>
+  <title>SPX Express - Scanner Resi OCR Pro</title>
+
+  <!-- Google Font: Poppins & Font Awesome CDN untuk Ikon -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
-    /* Reset & Base Styles */
+    /* Reset & CSS Variables */
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      font-family: 'Poppins', sans-serif;
     }
-    
+
+    :root {
+      --spx-red: #d30000;
+      --spx-red-dark: #b00000;
+      --spx-red-light: #fff0f0;
+      --bg-gradient: linear-gradient(180deg, #b80000 0%, #e60000 20%, #f4f5f7 40%, #f4f5f7 100%);
+      --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+      --text-dark: #2d3748;
+      --text-muted: #718096;
+    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #f8fafc;
-      color: #1e293b;
-      line-height: 1.5;
-      padding-bottom: 40px;
+      background: var(--bg-gradient);
+      color: var(--text-dark);
+      padding-bottom: 90px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
     }
 
-    /* Header Modern */
+    /* App Container (Mobile Frame Constraint) */
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      position: relative;
+      padding: 0 16px;
+    }
+
+    /* HEADER SECTION */
     .header {
-      background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+      padding: 20px 0 10px 0;
       color: white;
-      padding: 20px 15px;
-      font-size: 22px;
-      font-weight: 800;
-      text-align: center;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      letter-spacing: -0.5px;
     }
 
-    .header span {
-      font-weight: 400;
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .logo-area .spx-logo {
+      font-size: 32px;
+      font-weight: 900;
+      font-style: italic;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+
+    .logo-area .spx-logo span {
+      font-size: 14px;
+      font-style: normal;
+      display: block;
+      font-weight: 700;
+      margin-top: -4px;
+      letter-spacing: 0;
+    }
+
+    .app-title-desc {
+      text-align: left;
+      margin-top: 4px;
+    }
+
+    .app-title-desc h1 {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .app-title-desc p {
+      font-size: 10px;
       opacity: 0.9;
-      font-size: 18px;
     }
 
-    /* Main Container */
-    .container {
-      max-width: 540px;
-      margin: 0 auto;
-      padding: 20px 15px;
+    .ri-badge {
+      text-align: right;
     }
 
-    /* Card Styling */
+    .ri-badge .dirgahayu {
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1.1;
+      text-transform: uppercase;
+    }
+
+    .ri-badge .big-81 {
+      font-size: 42px;
+      font-weight: 900;
+      line-height: 0.9;
+      display: inline-block;
+    }
+
+    .ri-badge .big-81 span {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .ri-badge .slogan {
+      font-size: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .hub-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-top: 8px;
+      backdrop-filter: blur(4px);
+    }
+
+    /* CARD SYSTEM */
     .card {
       background: white;
-      padding: 20px;
-      margin-bottom: 20px;
       border-radius: 16px;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
-      border: 1px solid #f1f5f9;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: var(--card-shadow);
+      position: relative;
     }
 
-    /* Typography & Labels */
-    label.title, .card-title {
-      display: block;
-      margin-bottom: 10px;
-      font-size: 15px;
+    /* Card: Petugas */
+    .field-label {
+      font-size: 11px;
       font-weight: 700;
-      color: #475569;
+      color: #4a5568;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    /* Input Fields */
-    input[type="text"] {
-      width: 100%;
-      padding: 14px 16px;
-      border: 2px solid #e2e8f0;
-      border-radius: 12px;
-      font-size: 16px;
-      color: #1e293b;
-      background-color: white;
-      transition: all 0.2s ease-in-out;
-      -webkit-appearance: none;
-    }
-
-    input[type="text"]:focus {
-      outline: none;
-      border-color: #16a34a;
-      box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
-    }
-
-    input[type="text"]::placeholder {
-      color: #94a3b8;
-    }
-
-    /* Buttons Style */
-    .button-group {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-top: 15px;
-    }
-
-    button, .tombol-btn {
       display: flex;
       align-items: center;
-      justify-content: center;
-      width: 100%;
-      padding: 16px 20px;
-      border: 0;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      text-align: center;
-      text-decoration: none;
-      transition: all 0.2s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    button:active, .tombol-btn:active {
-      transform: translateY(1px);
-      filter: brightness(95%);
-    }
-
-    .btn-main { background-color: #16a34a; color: white; box-shadow: 0 4px 6px rgba(22, 163, 74, 0.2); }
-    .btn-main:hover { background-color: #15803d; }
-
-    .btn-secondary { background-color: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
-    .btn-secondary:hover { background-color: #e2e8f0; }
-
-    .btn-action { background-color: #2563eb; color: white; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2); }
-    .btn-action:hover { background-color: #1d4ed8; }
-
-    .btn-danger { background-color: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
-    .btn-danger:hover { background-color: #fecaca; }
-
-    /* Area Foto & Scan */
-    #foto {
-      width: 100%;
-      max-height: 280px;
-      object-fit: contain;
-      border-radius: 12px;
-      margin-top: 15px;
-      display: none;
-      border: 2px solid #e2e8f0;
-      background-color: #ffffff;
-    }
-
-    /* Area Hasil OCR */
-    .hasil-container {
-      margin-top: 15px;
-    }
-
-    .hasil-box {
-      background-color: #f0fdf4;
-      border: 2px dashed #bbf7d0;
-      padding: 15px;
-      border-radius: 12px;
-      word-break: break-all;
-    }
-
-    .hasil-box b {
-      font-size: 20px;
-      color: #15803d;
-      display: block;
+      gap: 6px;
       margin-bottom: 8px;
     }
 
-    .raw-text {
-      color: #64748b;
-      font-size: 13px;
-      max-height: 80px;
-      overflow-y: auto;
-      display: block;
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid #d1fae5;
+    .field-label i {
+      color: var(--spx-red);
     }
 
-    /* Counter Resi */
-    .total-container {
-      text-align: center;
-      margin-bottom: 15px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid #f1f5f9;
+    .input-box {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 0 12px;
     }
 
-    .total-label {
+    .input-box input {
+      width: 100%;
+      border: none;
+      padding: 10px 0;
       font-size: 14px;
-      color: #64748b;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+      font-weight: 600;
+      color: var(--text-dark);
+      outline: none;
     }
 
-    .total-number {
-      font-size: 42px;
+    .input-box i {
+      color: var(--spx-red);
+      font-size: 18px;
+    }
+
+    /* Card: Resi Terrekam */
+    .counter-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+    }
+
+    .mini-badge {
+      background: var(--spx-red);
+      color: white;
+      border-radius: 12px;
+      padding: 10px 14px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(211, 0, 0, 0.25);
+    }
+
+    .mini-badge i {
+      font-size: 18px;
+      margin-bottom: 2px;
+    }
+
+    .mini-badge div {
+      font-size: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .mini-badge span {
+      font-size: 12px;
       font-weight: 800;
-      color: #16a34a;
+    }
+
+    .counter-center {
+      text-align: center;
+    }
+
+    .counter-center .title {
+      font-size: 10px;
+      font-weight: 800;
+      color: #4a5568;
+      letter-spacing: 0.5px;
+    }
+
+    .counter-center .number {
+      font-size: 44px;
+      font-weight: 900;
+      color: var(--spx-red);
+      line-height: 1;
+      margin: 2px 0;
+    }
+
+    .counter-center .subtext {
+      font-size: 11px;
+      font-style: italic;
+      color: var(--text-muted);
+    }
+
+    .counter-center .subtext span {
+      color: var(--spx-red);
+      font-weight: 700;
+    }
+
+    .box-illustration {
+      width: 65px;
+      height: auto;
+    }
+
+    /* BUTTON ACTION GRID */
+    .action-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .btn-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: var(--card-shadow);
+      border: none;
+      text-align: left;
+    }
+
+    .btn-card.primary {
+      background: linear-gradient(135deg, #e60000 0%, #b80000 100%);
+      color: white;
+    }
+
+    .btn-card.secondary {
+      background: white;
+      color: var(--text-dark);
+      border: 1px solid #edf2f7;
+    }
+
+    .btn-icon-wrapper {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .primary .btn-icon-wrapper {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+    }
+
+    .secondary .btn-icon-wrapper {
+      background: #fff0f0;
+      color: var(--spx-red);
+    }
+
+    .btn-text h4 {
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1.2;
+      text-transform: uppercase;
+    }
+
+    .btn-text p {
+      font-size: 8px;
+      opacity: 0.85;
+      margin-top: 2px;
+    }
+
+    .btn-arrow {
+      margin-left: auto;
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    /* NOMOR RESI TERDETEKSI */
+    .detected-card {
+      padding: 14px;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .detected-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: var(--spx-red);
+      color: white;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 3px 12px;
+      border-bottom-right-radius: 10px;
+      text-transform: uppercase;
+    }
+
+    .detected-number-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 12px 0 6px 0;
+    }
+
+    .detected-number {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--spx-red);
+      letter-spacing: 0.5px;
+    }
+
+    .spx-inline-logo {
+      font-size: 16px;
+      font-weight: 900;
+      font-style: italic;
+      color: var(--spx-red);
       line-height: 1;
     }
 
-    /* Input Manual Bar */
-    .input-manual-bar {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
+    .spx-inline-logo span {
+      font-size: 6px;
+      display: block;
+      font-style: normal;
     }
 
-    .input-manual-bar input {
-      flex: 1;
-    }
-
-    .input-manual-bar button {
-      width: auto;
-      padding: 14px 20px;
-    }
-
-    /* Daftar Resi */
-    #daftar {
-      margin-top: 10px;
-    }
-
-    .resi-item {
-      display: flex;
-      justify-content: space-between;
+    .status-success {
+      display: inline-flex;
       align-items: center;
-      padding: 14px;
-      background-color: white;
-      border-bottom: 1px solid #f1f5f9;
-      transition: background-color 0.2s;
+      gap: 6px;
+      font-size: 11px;
+      color: #278927;
+      font-weight: 600;
+      margin-top: 4px;
     }
 
-    .resi-item:hover {
-      background-color: #f8fafc;
+    /* HASIL DETEKSI OTOMATIS */
+    .ocr-box {
+      background: #f0fff4;
+      border: 1px dashed #68d391;
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
     }
 
-    .resi-item:last-child {
-      border-bottom: none;
+    .ocr-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    .resi-info {
+    .ocr-icon-circle {
+      width: 32px;
+      height: 32px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #278927;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .ocr-details .title {
+      font-size: 9px;
+      font-weight: 800;
+      color: #278927;
+      text-transform: uppercase;
+    }
+
+    .ocr-details .value {
+      font-size: 13px;
+      font-weight: 800;
+      color: #278927;
+    }
+
+    .ocr-details .subvalue {
+      font-size: 9px;
+      color: #a0aec0;
+    }
+
+    .ocr-printer-img {
+      width: 45px;
+    }
+
+    /* BUTTON TAMBAHKAN */
+    .btn-submit {
+      width: 100%;
+      background: linear-gradient(135deg, #e60000 0%, #b80000 100%);
+      color: white;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       gap: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(211, 0, 0, 0.3);
+      margin-bottom: 14px;
     }
 
-    .resi-number-tag {
-      font-size: 12px;
-      color: #94a3b8;
-      font-weight: 600;
-      width: 24px;
-    }
-
-    .resi-value {
-      font-size: 16px;
-      font-weight: 600;
-      color: #1e293b;
-      word-break: break-all;
-    }
-
-    .resi-item button {
-      width: auto;
-      margin: 0;
-      padding: 6px 12px;
-      font-size: 12px;
-      font-weight: 600;
+    .btn-submit .icon-square {
+      width: 28px;
+      height: 28px;
+      border: 1.5px solid white;
       border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
     }
 
-    /* Status Bar */
-    .status-bar {
-      margin-top: 15px;
-      padding: 12px;
-      border-radius: 10px;
-      background-color: #f1f5f9;
-      font-size: 14px;
-      color: #64748b;
-      text-align: center;
-      font-weight: 500;
+    .btn-submit .text h4 {
+      font-size: 12px;
+      font-weight: 800;
+      text-align: left;
+      text-transform: uppercase;
+    }
+
+    .btn-submit .text p {
+      font-size: 9px;
+      opacity: 0.85;
+      text-align: left;
+    }
+
+    .btn-submit i.arrow {
+      margin-left: auto;
+      font-size: 12px;
+    }
+
+    /* INPUT MANUAL */
+    .manual-card {
+      padding: 12px 16px;
+    }
+
+    .manual-input-group {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .manual-input-group input {
+      flex: 1;
+      background: #f8fafc;
       border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 11px;
+      outline: none;
+    }
+
+    .btn-add-manual {
+      background: var(--spx-red);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* STATS SUMMARY ROW */
+    .stats-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      background: white;
+      border-radius: 14px;
+      padding: 10px;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .stat-item:not(:last-child) {
+      border-right: 1px solid #edf2f7;
+    }
+
+    .stat-icon {
+      font-size: 18px;
+      color: var(--spx-red);
+    }
+
+    .stat-text .label {
+      font-size: 7px;
+      font-weight: 800;
+      color: #718096;
+      text-transform: uppercase;
+    }
+
+    .stat-text .val {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    /* BOTTOM NAVBAR */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      background: white;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 8px 0;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 9px;
+      font-weight: 600;
+      color: #a0aec0;
+      text-decoration: none;
+      gap: 2px;
+    }
+
+    .nav-item i {
+      font-size: 16px;
+    }
+
+    .nav-item.active {
+      color: var(--spx-red);
+    }
+
+    /* Floating Center Scan Button */
+    .nav-item.scan-center {
+      position: relative;
+      top: -16px;
+    }
+
+    .scan-circle {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #e60000 0%, #b80000 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 20px;
+      box-shadow: 0 4px 12px rgba(211, 0, 0, 0.4);
+      border: 3px solid white;
     }
   </style>
 </head>
-
 <body>
 
-<div class="header">
-  📦 Scanner Resi <span>OCR & Barcode Pro</span>
-</div>
+<div class="app-container">
 
-<div class="container">
+  <!-- HEADER SECTION -->
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="logo-area">
+          <div class="spx-logo">SPX<span>EXPRESS</span></div>
+        </div>
+        <div class="app-title-desc">
+          <h1>Scanner Resi OCR <span>Pro</span></h1>
+          <p>Scan • Deteksi • Simpan</p>
+        </div>
+      </div>
 
-  <!-- Identitas Petugas -->
-  <div class="card">
-    <label class="title" for="petugas">👤 Nama Petugas / Kurir</label>
-    <input id="petugas" type="text" placeholder="Contoh: Dhian Purnomo" value="Dhian Purnomo" autocomplete="off">
+      <div class="ri-badge">
+        <div class="dirgahayu">DIRGAHAYU<br>REPUBLIK<br>INDONESIA</div>
+        <div class="big-81">81<span>TH</span></div>
+        <div class="slogan">TERUS MELAJU<br>UNTUK INDONESIA MAJU</div>
+      </div>
+    </div>
+
+    <div class="hub-pill">
+      <i class="fa-solid fa-location-dot"></i> TANJUNGANOM 2 HUB
+    </div>
   </div>
 
-  <!-- Area Pindaian -->
-  <div class="card">
-    <div class="total-container">
-      <div class="total-label">Resi Terrekam</div>
-      <div class="total-number"><span>2</span></div>
+  <!-- NAMA PETUGAS CARD -->
+  <div class="card" style="margin-top: 10px;">
+    <div class="field-label">
+      <i class="fa-solid fa-user"></i> NAMA PETUGAS / KURIR
+    </div>
+    <div class="input-box">
+      <input type="text" value="Cak wid" placeholder="Masukkan nama petugas">
+      <i class="fa-regular fa-address-card"></i>
+    </div>
+  </div>
+
+  <!-- COUNTER CARD -->
+  <div class="card counter-card">
+    <div class="mini-badge">
+      <i class="fa-solid fa-chart-column"></i>
+      <div>HARI INI</div>
+      <span>0</span>
     </div>
 
-    <div class="button-group">
-      <label class="tombol-btn btn-main">
-        📷 AMBIL FOTO RESI
-      </label>
-
-      <label class="tombol-btn btn-secondary">
-        🖼️ PILIH DARI GALERI
-      </label>
+    <div class="counter-center">
+      <div class="title">RESI TERREKAM HARI INI</div>
+      <div class="number">0</div>
+      <div class="subtext">Terus semangat, <span>Merah Putih!</span> ❤️</div>
     </div>
 
-    <!-- Status Pembacaan -->
-    <div class="status-bar" style="color: #16a34a;">
-      ✅ Nomor resi berhasil terdeteksi.
-    </div>
+    <!-- Paket Kerdus Illustration (SVG Data) -->
+    <svg class="box-illustration" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M100 30L170 65V135L100 170L30 135V65L100 30Z" fill="#D69E2E"/>
+      <path d="M100 30L170 65L100 100L30 65L100 30Z" fill="#ECC94B"/>
+      <path d="M100 100V170L30 135V65L100 100Z" fill="#B7791F"/>
+      <rect x="50" y="80" width="35" height="15" rx="2" fill="#D30000" transform="rotate(-15 50 80)"/>
+      <text x="53" y="91" font-family="Poppins" font-weight="900" font-size="8" fill="white" transform="rotate(-15 50 80)">SPX</text>
+    </svg>
+  </div>
 
-    <!-- Contoh Tampilan Hasil Pindaian -->
-    <div class="hasil-container">
-      <div class="hasil-box">
-        <div class="card-title">🔍 Hasil Deteksi Otomatis:</div>
-        <b>SPXID03291823712</b>
-        <span style="font-size:11px; color:#16a34a; font-weight:bold;">Terdeteksi via Barcode Reader</span>
-        <span class="raw-text">RAW OCR: SPXID03291823712 STANDARD DELIVERY</span>
+  <!-- ACTION BUTTONS GRID -->
+  <div class="action-grid">
+    <button class="btn-card primary">
+      <div class="btn-icon-wrapper">
+        <i class="fa-solid fa-camera"></i>
       </div>
-      
-      <button class="btn-main" style="margin-top:12px">
-        ✅ TAMBAHKAN NOMOR INI
+      <div class="btn-text">
+        <h4>AMBIL FOTO RESI</h4>
+        <p>Scan resi dengan kamera</p>
+      </div>
+      <i class="fa-solid fa-chevron-right btn-arrow"></i>
+    </button>
+
+    <button class="btn-card secondary">
+      <div class="btn-icon-wrapper">
+        <i class="fa-regular fa-image"></i>
+      </div>
+      <div class="btn-text">
+        <h4>PILIH DARI GALERI</h4>
+        <p>Pilih gambar resi dari galeri</p>
+      </div>
+      <i class="fa-solid fa-chevron-right btn-arrow"></i>
+    </button>
+  </div>
+
+  <!-- RESI TERDETEKSI CARD -->
+  <div class="card detected-card">
+    <div class="detected-header">NOMOR RESI TERDETEKSI</div>
+    
+    <div class="detected-number-box">
+      <div class="detected-number">SPXID068255909326</div>
+      <div class="spx-inline-logo">SPX<span>EXPRESS</span></div>
+    </div>
+
+    <div class="status-success">
+      <i class="fa-solid fa-circle-check"></i> Nomor resi berhasil terdeteksi.
+    </div>
+  </div>
+
+  <!-- OCR RESULT CARD -->
+  <div class="ocr-box">
+    <div class="ocr-info">
+      <div class="ocr-icon-circle">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </div>
+      <div class="ocr-details">
+        <div class="title">HASIL DETEKSI OTOMATIS:</div>
+        <div class="value">SPXID068255909326</div>
+        <div class="subvalue">SPXID068255909326</div>
+      </div>
+    </div>
+
+    <!-- Thermal Printer Illustration (SVG Data) -->
+    <svg class="ocr-printer-img" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="30" width="80" height="40" rx="6" fill="#4A5568"/>
+      <rect x="20" y="10" width="60" height="25" rx="3" fill="#E2E8F0"/>
+      <path d="M25 15H75V30H25V15Z" fill="white"/>
+      <text x="35" y="25" font-family="Poppins" font-weight="900" font-size="8" fill="#D30000">SPX</text>
+      <rect x="20" y="55" width="60" height="4" rx="2" fill="#22C55E"/>
+    </svg>
+  </div>
+
+  <!-- ADD BUTTON -->
+  <button class="btn-submit">
+    <div class="icon-square">
+      <i class="fa-solid fa-plus"></i>
+    </div>
+    <div class="text">
+      <h4>TAMBAHKAN NOMOR INI</h4>
+      <p>Simpan ke daftar resi</p>
+    </div>
+    <i class="fa-solid fa-chevron-right arrow"></i>
+  </button>
+
+  <!-- MANUAL INPUT CARD -->
+  <div class="card manual-card">
+    <div class="field-label">
+      <i class="fa-regular fa-keyboard"></i> INPUT RESI MANUAL
+    </div>
+    <div class="manual-input-group">
+      <input type="text" placeholder="Contoh: SPXID068255909326">
+      <button class="btn-add-manual">
+        <i class="fa-solid fa-plus"></i> Tambah
       </button>
     </div>
   </div>
 
-  <!-- Input Manual Resi -->
-  <div class="card">
-    <div class="card-title">⌨️ Input Resi Manual</div>
-    <div class="input-manual-bar">
-      <input type="text" placeholder="Masukkan SPXID...">
-      <button class="btn-action">+ Tambah</button>
-    </div>
-  </div>
-
-  <!-- Daftar Resi Contoh Dummy -->
-  <div class="card">
-    <div class="card-title">📄 Daftar Resi</div>
-    <div id="daftar">
-      <div class="resi-item">
-        <div class="resi-info">
-          <span class="resi-number-tag">1.</span>
-          <span class="resi-value">SPXID03291823712</span>
-        </div>
-        <button class="btn-danger">Hapus</button>
+  <!-- STATS SUMMARY ROW -->
+  <div class="stats-row">
+    <div class="stat-item">
+      <i class="fa-solid fa-chart-line stat-icon"></i>
+      <div class="stat-text">
+        <div class="label">RESI HARI INI</div>
+        <div class="val">0</div>
       </div>
-      <div class="resi-item">
-        <div class="resi-info">
-          <span class="resi-number-tag">2.</span>
-          <span class="resi-value">SPXID03982310111</span>
-        </div>
-        <button class="btn-danger">Hapus</button>
+    </div>
+
+    <div class="stat-item">
+      <i class="fa-solid fa-bullseye stat-icon"></i>
+      <div class="stat-text">
+        <div class="label">TARGET HARI INI</div>
+        <div class="val">100</div>
+      </div>
+    </div>
+
+    <div class="stat-item">
+      <i class="fa-solid fa-award stat-icon"></i>
+      <div class="stat-text">
+        <div class="label">SEMANGAT</div>
+        <div class="val" style="color: var(--spx-red); font-size: 10px;">MERDEKA!</div>
       </div>
     </div>
   </div>
 
-  <!-- Aksi Kirim/Hapus -->
-  <div class="card" style="background-color: transparent; box-shadow: none; border: none; padding: 0;">
-    <div class="button-group">
-      <button class="btn-action">🚀 KIRIM SEMUA RESI</button>
-      <button class="btn-danger">🗑️ HAPUS SEMUA</button>
-    </div>
+  <!-- BOTTOM NAVIGATION BAR -->
+  <div class="bottom-nav">
+    <a href="#" class="nav-item active">
+      <i class="fa-solid fa-house"></i>
+      <span>Beranda</span>
+    </a>
+    <a href="#" class="nav-item">
+      <i class="fa-regular fa-clock"></i>
+      <span>Riwayat</span>
+    </a>
+    <a href="#" class="nav-item scan-center">
+      <div class="scan-circle">
+        <i class="fa-solid fa-expand"></i>
+      </div>
+      <span>Scan</span>
+    </a>
+    <a href="#" class="nav-item">
+      <i class="fa-solid fa-chart-simple"></i>
+      <span>Statistik</span>
+    </a>
+    <a href="#" class="nav-item">
+      <i class="fa-solid fa-gear"></i>
+      <span>Pengaturan</span>
+    </a>
   </div>
 
 </div>
