@@ -1136,7 +1136,33 @@
     if (elStatus) elStatus.innerText = "Daftar resi telah dibersihkan.";
   }
 
-  async function kirimSemua() {
+  // --- IMPLEMENTASI JSONP CALLBACK & FUNCTION ---
+  
+  // Fungsi Global Callback untuk menangkap respon dari Google Apps Script
+  window.kirimResiCallback = function(response) {
+    // Hapus script temp jika ada
+    const oldScript = document.getElementById("jsonpScript");
+    if (oldScript) oldScript.remove();
+
+    if (response && response.status === "success") {
+      alert("✅ " + response.message);
+      resi = [];
+      simpan();
+      tampilkan();
+      if (elStatus) {
+        elStatus.innerText = "✅ Data berhasil dikirim ke Google Sheets!";
+        elStatus.style.color = "#16a34a";
+      }
+    } else {
+      alert("❌ Gagal menyimpan data: " + (response ? response.message : "Error tidak diketahui"));
+      if (elStatus) {
+        elStatus.innerText = "❌ Gagal mengirim data.";
+        elStatus.style.color = "#dc2626";
+      }
+    }
+  };
+
+  function kirimSemua() {
     const namaPetugas = elPetugas ? elPetugas.value.trim() : "";
 
     if (!namaPetugas) {
@@ -1152,45 +1178,42 @@
 
     if (!confirm("🚀 Kirim " + resi.length + " resi sekarang?")) return;
 
-    const batchId = namaPetugas.toUpperCase().substring(0,3) + "-" + Date.now();
+    if (elStatus) {
+      elStatus.innerText = "⏳ Sedang mengirim data via JSONP...";
+      elStatus.style.color = "#2563eb";
+    }
+
+    const batchId = namaPetugas.toUpperCase().substring(0, 3) + "-" + Date.now();
     const payload = {
       petugas: namaPetugas,
       batch: batchId,
       resi: resi
     };
 
-    if (elStatus) {
-      elStatus.innerText = "⏳ Sedang mengirim data...";
-      elStatus.style.color = "#2563eb";
-    }
+    // Encode JSON data untuk dikirim via URL GET
+    const jsonString = encodeURIComponent(JSON.stringify(payload));
+    const callbackName = "kirimResiCallback";
+    const fullUrl = `${APPS_SCRIPT_URL}?callback=${callbackName}&data=${jsonString}`;
 
-    try {
-      await fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors", 
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8"
-        },
-        body: JSON.stringify(payload)
-      });
+    // Hapus script injection lama jika ada
+    const oldScript = document.getElementById("jsonpScript");
+    if (oldScript) oldScript.remove();
 
-      alert("✅ Data berhasil dikirim!");
-      resi = [];
-      simpan();
-      tampilkan();
+    // Buat elemen <script> secara dinamis
+    const script = document.createElement("script");
+    script.id = "jsonpScript";
+    script.src = fullUrl;
+
+    script.onerror = function() {
+      alert("❌ Terjadi kesalahan koneksi saat menghubungi Google Apps Script.");
       if (elStatus) {
-        elStatus.innerText = "✅ Data berhasil dikirim ke pusat.";
-        elStatus.style.color = "#16a34a";
-      }
-
-    } catch(error) {
-      console.error(error);
-      alert("❌ Pengiriman gagal. Coba cek koneksi internet Anda.");
-      if (elStatus) {
-        elStatus.innerText = "❌ Gagal mengirim data.";
+        elStatus.innerText = "❌ Pengiriman data gagal/terputus.";
         elStatus.style.color = "#dc2626";
       }
-    }
+      script.remove();
+    };
+
+    document.body.appendChild(script);
   }
 
   // Jalankan saat halaman siap
