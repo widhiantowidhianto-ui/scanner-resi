@@ -3,10 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SPX Express - Scanner Resi OCR Pro</title>
+  <title>SPX Express - Scanner Resi OCR Pro v5.0</title>
 
-  <!-- Google Font: Poppins & Font Awesome CDN untuk Ikon -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Library ZXing (Detector Barcode/QR Super Cepat & Akurat) -->
+  <script src="https://unpkg.com/@zxing/library@latest"></script>
+  <!-- Library Tesseract OCR -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+  <!-- Google Font & Font Awesome untuk Ikon -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
@@ -22,7 +27,7 @@
       --spx-red: #d30000;
       --spx-red-dark: #b00000;
       --spx-red-light: #fff0f0;
-      --bg-gradient: linear-gradient(180deg, #b80000 0%, #e60000 20%, #f4f5f7 40%, #f4f5f7 100%);
+      --bg-gradient: linear-gradient(180deg, #b80000 0%, #e60000 180px, #f4f5f7 180px, #f4f5f7 100%);
       --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
       --text-dark: #2d3748;
       --text-muted: #718096;
@@ -182,7 +187,7 @@
       font-size: 18px;
     }
 
-    /* Card: Resi Terrekam */
+    /* Card: Counter */
     .counter-card {
       display: flex;
       align-items: center;
@@ -321,66 +326,36 @@
       opacity: 0.7;
     }
 
-    /* NOMOR RESI TERDETEKSI */
-    .detected-card {
-      padding: 14px;
+    /* PREVIEW & HASIL SCAN */
+    #foto {
+      width: 100%;
+      max-height: 220px;
+      object-fit: contain;
+      border-radius: 12px;
+      margin-top: 10px;
+      display: none;
+      border: 2px dashed var(--spx-red);
+      background-color: #ffffff;
+    }
+
+    .status-bar {
+      margin: 12px 0;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background-color: #ffffff;
+      font-size: 12px;
+      color: var(--text-muted);
       text-align: center;
-      overflow: hidden;
-    }
-
-    .detected-header {
-      position: absolute;
-      top: 0;
-      left: 0;
-      background: var(--spx-red);
-      color: white;
-      font-size: 9px;
-      font-weight: 800;
-      padding: 3px 12px;
-      border-bottom-right-radius: 10px;
-      text-transform: uppercase;
-    }
-
-    .detected-number-box {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      margin: 12px 0 6px 0;
-    }
-
-    .detected-number {
-      font-size: 20px;
-      font-weight: 900;
-      color: var(--spx-red);
-      letter-spacing: 0.5px;
-    }
-
-    .spx-inline-logo {
-      font-size: 16px;
-      font-weight: 900;
-      font-style: italic;
-      color: var(--spx-red);
-      line-height: 1;
-    }
-
-    .spx-inline-logo span {
-      font-size: 6px;
-      display: block;
-      font-style: normal;
-    }
-
-    .status-success {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      color: #278927;
       font-weight: 600;
-      margin-top: 4px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
     }
 
-    /* HASIL DETEKSI OTOMATIS */
+    .hasil-container {
+      margin-top: 12px;
+      display: none;
+    }
+
     .ocr-box {
       background: #f0fff4;
       border: 1px dashed #68d391;
@@ -389,13 +364,14 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
     }
 
     .ocr-info {
       display: flex;
       align-items: center;
       gap: 10px;
+      width: 100%;
     }
 
     .ocr-icon-circle {
@@ -408,6 +384,11 @@
       justify-content: center;
       color: #278927;
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      flex-shrink: 0;
+    }
+
+    .ocr-details {
+      width: 100%;
     }
 
     .ocr-details .title {
@@ -417,22 +398,18 @@
       text-transform: uppercase;
     }
 
-    .ocr-details .value {
-      font-size: 13px;
-      font-weight: 800;
-      color: #278927;
+    .raw-text {
+      color: #64748b;
+      font-size: 11px;
+      max-height: 60px;
+      overflow-y: auto;
+      display: block;
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px dashed #bbf7d0;
     }
 
-    .ocr-details .subvalue {
-      font-size: 9px;
-      color: #a0aec0;
-    }
-
-    .ocr-printer-img {
-      width: 45px;
-    }
-
-    /* BUTTON TAMBAHKAN */
+    /* BUTTON TAMBAHKAN NOMOR */
     .btn-submit {
       width: 100%;
       background: linear-gradient(135deg, #e60000 0%, #b80000 100%);
@@ -445,7 +422,7 @@
       gap: 12px;
       cursor: pointer;
       box-shadow: 0 4px 12px rgba(211, 0, 0, 0.3);
-      margin-bottom: 14px;
+      margin-top: 8px;
     }
 
     .btn-submit .icon-square {
@@ -494,8 +471,13 @@
       border: 1px solid #e2e8f0;
       border-radius: 10px;
       padding: 8px 12px;
-      font-size: 11px;
+      font-size: 12px;
       outline: none;
+      font-weight: 600;
+    }
+
+    .manual-input-group input:focus {
+      border-color: var(--spx-red);
     }
 
     .btn-add-manual {
@@ -510,6 +492,106 @@
       display: flex;
       align-items: center;
       gap: 4px;
+    }
+
+    /* DAFTAR RESI */
+    .resi-list-card {
+      padding: 16px;
+    }
+
+    .card-title {
+      font-size: 11px;
+      font-weight: 800;
+      color: #4a5568;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .resi-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px dashed #e2e8f0;
+    }
+
+    .resi-item:last-child {
+      border-bottom: none;
+    }
+
+    .resi-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .resi-number-tag {
+      font-size: 11px;
+      color: #a0aec0;
+      font-weight: 700;
+      width: 20px;
+    }
+
+    .resi-value {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-dark);
+      letter-spacing: 0.5px;
+    }
+
+    .btn-delete-item {
+      background: #fff0f0;
+      color: var(--spx-red);
+      border: none;
+      padding: 4px 10px;
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: #a0aec0;
+      padding: 15px 0;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    /* BOTTON ACTION BULK */
+    .bulk-action-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .btn-send-all {
+      width: 100%;
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+    }
+
+    .btn-delete-all {
+      width: 100%;
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+      padding: 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
     }
 
     /* STATS SUMMARY ROW */
@@ -592,7 +674,6 @@
       color: var(--spx-red);
     }
 
-    /* Floating Center Scan Button */
     .nav-item.scan-center {
       position: relative;
       top: -16px;
@@ -648,7 +729,7 @@
       <i class="fa-solid fa-user"></i> NAMA PETUGAS / KURIR
     </div>
     <div class="input-box">
-      <input type="text" value="Cak wid" placeholder="Masukkan nama petugas">
+      <input id="petugas" type="text" placeholder="Contoh: Dhian Purnomo" autocomplete="off">
       <i class="fa-regular fa-address-card"></i>
     </div>
   </div>
@@ -658,16 +739,15 @@
     <div class="mini-badge">
       <i class="fa-solid fa-chart-column"></i>
       <div>HARI INI</div>
-      <span>0</span>
+      <span id="jumlahMini">0</span>
     </div>
 
     <div class="counter-center">
       <div class="title">RESI TERREKAM HARI INI</div>
-      <div class="number">0</div>
+      <div class="number"><span id="jumlah">0</span></div>
       <div class="subtext">Terus semangat, <span>Merah Putih!</span> ❤️</div>
     </div>
 
-    <!-- Paket Kerdus Illustration (SVG Data) -->
     <svg class="box-illustration" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M100 30L170 65V135L100 170L30 135V65L100 30Z" fill="#D69E2E"/>
       <path d="M100 30L170 65L100 100L30 65L100 30Z" fill="#ECC94B"/>
@@ -679,7 +759,7 @@
 
   <!-- ACTION BUTTONS GRID -->
   <div class="action-grid">
-    <button class="btn-card primary">
+    <label for="kameraInput" class="btn-card primary">
       <div class="btn-icon-wrapper">
         <i class="fa-solid fa-camera"></i>
       </div>
@@ -688,9 +768,10 @@
         <p>Scan resi dengan kamera</p>
       </div>
       <i class="fa-solid fa-chevron-right btn-arrow"></i>
-    </button>
+    </label>
+    <input id="kameraInput" type="file" accept="image/*" capture="environment" style="display:none" onchange="prosesFile(event)">
 
-    <button class="btn-card secondary">
+    <label for="galeriInput" class="btn-card secondary">
       <div class="btn-icon-wrapper">
         <i class="fa-regular fa-image"></i>
       </div>
@@ -699,69 +780,69 @@
         <p>Pilih gambar resi dari galeri</p>
       </div>
       <i class="fa-solid fa-chevron-right btn-arrow"></i>
+    </label>
+    <input id="galeriInput" type="file" accept="image/*" style="display:none" onchange="prosesFile(event)">
+  </div>
+
+  <!-- PREVIEW FOTO & STATUS -->
+  <img id="foto" alt="Preview Resi">
+  <canvas id="procCanvas" style="display:none;"></canvas>
+
+  <div id="status" class="status-bar">
+    Siap. Ambil foto resi untuk mulai membaca.
+  </div>
+
+  <!-- HASIL PINDAIAN CARD -->
+  <div id="hasil" class="hasil-container">
+    <div class="ocr-box">
+      <div class="ocr-info">
+        <div class="ocr-icon-circle">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+        <div class="ocr-details">
+          <div class="title">HASIL DETEKSI OTOMATIS:</div>
+          <div id="hasilText"></div>
+        </div>
+      </div>
+    </div>
+
+    <button id="tambahBtn" class="btn-submit" style="display:none;" onclick="gunakanHasil()">
+      <div class="icon-square">
+        <i class="fa-solid fa-plus"></i>
+      </div>
+      <div class="text">
+        <h4>TAMBAHKAN NOMOR INI</h4>
+        <p>Simpan ke daftar resi</p>
+      </div>
+      <i class="fa-solid fa-chevron-right arrow"></i>
     </button>
   </div>
 
-  <!-- RESI TERDETEKSI CARD -->
-  <div class="card detected-card">
-    <div class="detected-header">NOMOR RESI TERDETEKSI</div>
-    
-    <div class="detected-number-box">
-      <div class="detected-number">SPXID068255909326</div>
-      <div class="spx-inline-logo">SPX<span>EXPRESS</span></div>
-    </div>
-
-    <div class="status-success">
-      <i class="fa-solid fa-circle-check"></i> Nomor resi berhasil terdeteksi.
-    </div>
-  </div>
-
-  <!-- OCR RESULT CARD -->
-  <div class="ocr-box">
-    <div class="ocr-info">
-      <div class="ocr-icon-circle">
-        <i class="fa-solid fa-magnifying-glass"></i>
-      </div>
-      <div class="ocr-details">
-        <div class="title">HASIL DETEKSI OTOMATIS:</div>
-        <div class="value">SPXID068255909326</div>
-        <div class="subvalue">SPXID068255909326</div>
-      </div>
-    </div>
-
-    <!-- Thermal Printer Illustration (SVG Data) -->
-    <svg class="ocr-printer-img" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="10" y="30" width="80" height="40" rx="6" fill="#4A5568"/>
-      <rect x="20" y="10" width="60" height="25" rx="3" fill="#E2E8F0"/>
-      <path d="M25 15H75V30H25V15Z" fill="white"/>
-      <text x="35" y="25" font-family="Poppins" font-weight="900" font-size="8" fill="#D30000">SPX</text>
-      <rect x="20" y="55" width="60" height="4" rx="2" fill="#22C55E"/>
-    </svg>
-  </div>
-
-  <!-- ADD BUTTON -->
-  <button class="btn-submit">
-    <div class="icon-square">
-      <i class="fa-solid fa-plus"></i>
-    </div>
-    <div class="text">
-      <h4>TAMBAHKAN NOMOR INI</h4>
-      <p>Simpan ke daftar resi</p>
-    </div>
-    <i class="fa-solid fa-chevron-right arrow"></i>
-  </button>
-
-  <!-- MANUAL INPUT CARD -->
+  <!-- INPUT MANUAL CARD -->
   <div class="card manual-card">
     <div class="field-label">
       <i class="fa-regular fa-keyboard"></i> INPUT RESI MANUAL
     </div>
     <div class="manual-input-group">
-      <input type="text" placeholder="Contoh: SPXID068255909326">
-      <button class="btn-add-manual">
+      <input id="manualResi" type="text" placeholder="Contoh: SPXID068255909326">
+      <button class="btn-add-manual" onclick="tambahManual()">
         <i class="fa-solid fa-plus"></i> Tambah
       </button>
     </div>
+  </div>
+
+  <!-- DAFTAR RESI CARD -->
+  <div class="card resi-list-card">
+    <div class="card-title">
+      <i class="fa-solid fa-receipt" style="color: var(--spx-red);"></i> DAFTAR RESI
+    </div>
+    <div id="daftar"></div>
+  </div>
+
+  <!-- BULK ACTIONS -->
+  <div class="bulk-action-group">
+    <button class="btn-send-all" onclick="kirimSemua()">🚀 KIRIM SEMUA RESI</button>
+    <button class="btn-delete-all" onclick="hapusSemua()">🗑️ HAPUS SEMUA</button>
   </div>
 
   <!-- STATS SUMMARY ROW -->
@@ -770,7 +851,7 @@
       <i class="fa-solid fa-chart-line stat-icon"></i>
       <div class="stat-text">
         <div class="label">RESI HARI INI</div>
-        <div class="val">0</div>
+        <div class="val" id="statResiHariIni">0</div>
       </div>
     </div>
 
@@ -802,9 +883,11 @@
       <span>Riwayat</span>
     </a>
     <a href="#" class="nav-item scan-center">
-      <div class="scan-circle">
-        <i class="fa-solid fa-expand"></i>
-      </div>
+      <label for="kameraInput" style="cursor: pointer;">
+        <div class="scan-circle">
+          <i class="fa-solid fa-expand"></i>
+        </div>
+      </label>
       <span>Scan</span>
     </a>
     <a href="#" class="nav-item">
@@ -818,6 +901,274 @@
   </div>
 
 </div>
+
+<script>
+  const APPS_SCRIPT_URL = "https://script.google.com/a/macros/spxexpress.com/s/AKfycbzMwkx6yYYu63IHNDiwKl7GwXggLjJSEOOhA-dFlKIOyjW0QzHquJ3iQFDdc8JHrm9hAw/exec";
+  
+  let hasilNomor = "";
+  let resi = JSON.parse(localStorage.getItem("scanner_resi") || "[]");
+
+  const elStatus = document.getElementById("status");
+  const elFoto = document.getElementById("foto");
+  const elCanvas = document.getElementById("procCanvas");
+  const elHasilContainer = document.getElementById("hasil");
+  const elHasilText = document.getElementById("hasilText");
+  const elTambahBtn = document.getElementById("tambahBtn");
+  const elPetugas = document.getElementById("petugas");
+  const elDaftar = document.getElementById("daftar");
+  const elJumlah = document.getElementById("jumlah");
+  const elJumlahMini = document.getElementById("jumlahMini");
+  const elStatResi = document.getElementById("statResiHariIni");
+
+  elPetugas.value = localStorage.getItem("scanner_petugas") || "";
+  elPetugas.addEventListener("input", function() {
+    localStorage.setItem("scanner_petugas", elPetugas.value);
+  });
+
+  function tampilkan() {
+    elJumlah.innerText = resi.length;
+    if (elJumlahMini) elJumlahMini.innerText = resi.length;
+    if (elStatResi) elStatResi.innerText = resi.length;
+
+    elDaftar.innerHTML = "";
+
+    if (resi.length === 0) {
+      elDaftar.innerHTML = "<div class='empty-state'>Belum ada resi yang ditambahkan.</div>";
+      return;
+    }
+
+    resi.forEach(function(nomor, index) {
+      const divItem = document.createElement("div");
+      divItem.className = "resi-item";
+      divItem.innerHTML = `
+        <div class="resi-info">
+          <span class="resi-number-tag">${index + 1}.</span>
+          <span class="resi-value">${nomor}</span>
+        </div>
+        <button class="btn-delete-item" onclick="hapusResi(${index})">Hapus</button>
+      `;
+      elDaftar.appendChild(divItem);
+    });
+  }
+
+  function simpan() {
+    localStorage.setItem("scanner_resi", JSON.stringify(resi));
+  }
+
+  function prosesFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    elHasilContainer.style.display = "none";
+    elTambahBtn.style.display = "none";
+    hasilNomor = "";
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = async function() {
+        elFoto.src = e.target.result;
+        elFoto.style.display = "block";
+
+        elStatus.innerText = "⚡ Menjalankan Pemindaian...";
+        elStatus.style.color = "#2563eb";
+
+        await prosesMultiEngine(img, e.target.result);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+    event.target.value = "";
+  }
+
+  // Dual Engine: Barcode Scanner -> OCR
+  async function prosesMultiEngine(imgElement, dataUrl) {
+    try {
+      const codeReader = new ZXing.BrowserMultiFormatReader();
+      const result = await codeReader.decodeFromImageUrl(dataUrl);
+
+      if (result && result.text) {
+        const kandidatBarcode = cariNomorResi(result.text);
+        if (kandidatBarcode) {
+          tampilkanSukses(kandidatBarcode, "Barcode Reader", result.text);
+          return;
+        }
+      }
+    } catch (e) {
+      console.log("Stage 1 (Barcode) tidak menemukan barcode, lanjut ke Stage 2 (OCR)...");
+    }
+
+    try {
+      elStatus.innerText = "⏳ Membaca Teks Resi (OCR)...";
+      
+      const worker = await Tesseract.createWorker("eng");
+      await worker.setParameters({
+        tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
+      });
+
+      const ret = await worker.recognize(imgElement);
+      await worker.terminate();
+
+      const teksMentah = ret.data.text || "";
+      const kandidatOCR = cariNomorResi(teksMentah);
+
+      if (kandidatOCR) {
+        tampilkanSukses(kandidatOCR, "OCR Engine", teksMentah);
+      } else {
+        elHasilContainer.style.display = "block";
+        elHasilText.innerHTML = `
+          <div style="color:#dc2626; font-weight:800; font-size: 13px;">Nomor resi SPXID tidak terdeteksi.</div>
+          <span class="raw-text">${teksMentah.replace(/\n/g, "<br>") || "Gambar tidak terbaca"}</span>
+        `;
+        elStatus.innerText = "⚠️ Format SPXID tidak terdeteksi otomatis.";
+        elStatus.style.color = "#ea580c";
+      }
+
+    } catch (err) {
+      console.error(err);
+      elStatus.innerText = "❌ Gagal memproses gambar: " + err.message;
+      elStatus.style.color = "#dc2626";
+    }
+  }
+
+  function tampilkanSukses(nomor, metode, teksMentah) {
+    hasilNomor = nomor;
+    elHasilContainer.style.display = "block";
+    elHasilText.innerHTML = `
+      <div style="font-size:16px; font-weight:900; color:#278927;">${nomor}</div>
+      <span style="font-size:10px; color:#278927; font-weight:700;">Terdeteksi via ${metode}</span>
+      <span class="raw-text">${teksMentah.replace(/\n/g, "<br>")}</span>
+    `;
+    elTambahBtn.style.display = "flex";
+    elStatus.innerText = "✅ Nomor resi berhasil terdeteksi.";
+    elStatus.style.color = "#16a34a";
+  }
+
+  function cariNomorResi(teks) {
+    if (!teks) return null;
+
+    let t = teks.toUpperCase().replace(/[\r\n\t]/g, " ").replace(/\s+/g, "");
+
+    let match = t.match(/SPXID(\d{10,15})/);
+    if (match) return "SPXID" + match[1];
+
+    match = t.match(/S\s*P\s*X\s*I\s*D\s*[-:]*\s*(\d{10,15})/);
+    if (match) return "SPXID" + match[1];
+
+    match = t.match(/SPX(ID|1D|IO|D|L)(\d{10,15})/);
+    if (match) return "SPXID" + match[2];
+
+    match = t.match(/(\d{10,14})/);
+    if (match && t.includes("SPX")) return "SPXID" + match[1];
+
+    return null;
+  }
+
+  function gunakanHasil() {
+    if (!hasilNomor) return;
+    tambahResi(hasilNomor);
+    
+    elHasilContainer.style.display = "none";
+    elTambahBtn.style.display = "none";
+    elFoto.style.display = "none";
+    elStatus.innerText = "Siap untuk scan berikutnya.";
+    elStatus.style.color = "#718096";
+  }
+
+  function tambahManual() {
+    const elInput = document.getElementById("manualResi");
+    const nilai = elInput.value.trim();
+    if (nilai) {
+      tambahResi(nilai);
+      elInput.value = "";
+    }
+  }
+
+  function tambahResi(nomor) {
+    nomor = String(nomor).toUpperCase().replace(/[^A-Z0-9]/g, "");
+
+    if (!nomor) return;
+
+    if (resi.includes(nomor)) {
+      alert("⚠️ Resi " + nomor + " sudah ada dalam daftar.");
+      return;
+    }
+
+    resi.unshift(nomor);
+    simpan();
+    tampilkan();
+  }
+
+  function hapusResi(index) {
+    if (confirm("Hapus resi " + resi[index] + "?")) {
+      resi.splice(index, 1);
+      simpan();
+      tampilkan();
+    }
+  }
+
+  function hapusSemua() {
+    if (resi.length === 0) return;
+    if (!confirm("⚠️ Yakin ingin menghapus SEMUA resi?")) return;
+    resi = [];
+    simpan();
+    tampilkan();
+    elStatus.innerText = "Daftar resi telah dibersihkan.";
+  }
+
+  async function kirimSemua() {
+    const namaPetugas = elPetugas.value.trim();
+
+    if (!namaPetugas) {
+      alert("⚠️ Harap masukkan Nama Petugas terlebih dahulu.");
+      elPetugas.focus();
+      return;
+    }
+
+    if (resi.length === 0) {
+      alert("⚠️ Belum ada resi untuk dikirim.");
+      return;
+    }
+
+    if (!confirm("🚀 Kirim " + resi.length + " resi sekarang?")) return;
+
+    const batchId = namaPetugas.toUpperCase().substring(0,3) + "-" + Date.now();
+    const payload = {
+      petugas: namaPetugas,
+      batch: batchId,
+      resi: resi
+    };
+
+    elStatus.innerText = "⏳ Sedang mengirim data...";
+    elStatus.style.color = "#2563eb";
+
+    try {
+      await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors", 
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      alert("✅ Data berhasil dikirim!");
+      resi = [];
+      simpan();
+      tampilkan();
+      elStatus.innerText = "✅ Data berhasil dikirim ke pusat.";
+      elStatus.style.color = "#16a34a";
+
+    } catch(error) {
+      console.error(error);
+      alert("❌ Pengiriman gagal. Coba cek koneksi internet Anda.");
+      elStatus.innerText = "❌ Gagal mengirim data.";
+      elStatus.style.color = "#dc2626";
+    }
+  }
+
+  tampilkan();
+</script>
 
 </body>
 </html>
