@@ -1184,30 +1184,33 @@
     }
 
     const batchId = namaPetugas.toUpperCase().substring(0, 3) + "-" + Date.now();
+    
+    // PAYLOAD SUDAH DITAMBAHKAN FIELD 'HUB'
     const payload = {
       petugas: namaPetugas,
+      hub: "TANJUNGANOM 2 HUB",
       batch: batchId,
       resi: resi
     };
 
-    // Encode JSON data untuk dikirim via URL GET
+    // Encode JSON untuk dikirim aman lewat URL
     const jsonString = encodeURIComponent(JSON.stringify(payload));
     const callbackName = "kirimResiCallback";
     const fullUrl = `${APPS_SCRIPT_URL}?callback=${callbackName}&data=${jsonString}`;
 
-    // Hapus script injection lama jika ada
+    // Hapus script tag lama jika ada
     const oldScript = document.getElementById("jsonpScript");
     if (oldScript) oldScript.remove();
 
-    // Buat elemen <script> secara dinamis
+    // Injection script tag baru
     const script = document.createElement("script");
     script.id = "jsonpScript";
     script.src = fullUrl;
 
     script.onerror = function() {
-      alert("❌ Terjadi kesalahan koneksi saat menghubungi Google Apps Script.");
+      alert("❌ Terjadi kesalahan koneksi saat mengirim data.");
       if (elStatus) {
-        elStatus.innerText = "❌ Pengiriman data gagal/terputus.";
+        elStatus.innerText = "❌ Pengiriman data gagal.";
         elStatus.style.color = "#dc2626";
       }
       script.remove();
