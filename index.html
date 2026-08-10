@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SPX Express - Scanner Resi OCR Pro v5.0</title>
 
-  <!-- Library ZXing (Barcode Reader) -->
+  <!-- Library ZXing -->
   <script src="https://unpkg.com/@zxing/library@latest"></script>
   <!-- Library Tesseract OCR -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -772,6 +772,7 @@
 
   <!-- PREVIEW FOTO & STATUS -->
   <img id="foto" alt="Preview Resi">
+  <canvas id="procCanvas" style="display:none;"></canvas>
 
   <div id="status" class="status-bar">
     Siap. Ambil foto resi untuk mulai membaca.
@@ -888,7 +889,7 @@
 </div>
 
 <script>
-  // Format URL Publik (Menghilangkan hambatan SSO kantor)
+  // URL PUBLIK APPS SCRIPT (Disterilkan dari domain internal kantor agar tembus di GitHub Pages)
   const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxlgZuE99QWdoW3JIuB8rnuQaKlGaLdDA237o1tYASd29-M-4CGzXVZGOZr1U4JAVMqiQ/exec";
   
   let hasilNomor = "";
@@ -950,51 +951,9 @@
     localStorage.setItem("scanner_resi", JSON.stringify(resi));
   }
 
-  async function prosesFile(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    if (elHasilContainer) elHasilContainer.style.display = "none";
-    if (elTambahBtn) elTambahBtn.style.display = "none";
-    hasilNomor = "";
-
-    if (elStatus) {
-      elStatus.innerText = "⚡ Mengoptimalkan Gambar...";
-      elStatus.style.color = "#2563eb";
-    }
-
-    try {
-      // Jalankan Preprocessing (Resizing & Binarization)
-      const processedDataUrl = await preprocessImage(file);
-
-      if (elFoto) {
-        elFoto.src = processedDataUrl;
-        elFoto.style.display = "block";
-      }
-
-      const img = new Image();
-      img.onload = async function() {
-        if (elStatus) {
-          elStatus.innerText = "⚡ Menjalankan Pemindaian Multi-Engine...";
-          elStatus.style.color = "#2563eb";
-        }
-        await prosesMultiEngine(img, processedDataUrl);
-      };
-      img.src = processedDataUrl;
-
-    } catch(err) {
-      console.error(err);
-      if (elStatus) {
-        elStatus.innerText = "❌ Gagal memproses berkas gambar.";
-        elStatus.style.color = "#dc2626";
-      }
-    }
-    
-    event.target.value = "";
-  }
-
+  // Preprocess Gambar untuk Meningkatkan Akurasi OCR Teks Kecil
   function preprocessImage(file, maxWidth = 1200) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = (e) => {
         const img = new Image();
@@ -1017,7 +976,7 @@
           const imageData = ctx.getImageData(0, 0, width, height);
           const data = imageData.data;
 
-          // Conversi Grayscale + Threshold Binarization
+          // Binarization (Binarisasi Hitam-Putih)
           for (let i = 0; i < data.length; i += 4) {
             const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
             const threshold = 120;
@@ -1029,14 +988,44 @@
           }
 
           ctx.putImageData(imageData, 0, 0);
-          resolve(canvas.toDataURL('image/jpeg', 0.9));
+          resolve({ dataUrl: canvas.toDataURL('image/jpeg', 0.9), imgElement: img });
         };
-        img.onerror = reject;
         img.src = e.target.result;
       };
-      reader.onerror = reject;
       reader.readAsDataURL(file);
     });
+  }
+
+  async function prosesFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (elHasilContainer) elHasilContainer.style.display = "none";
+    if (elTambahBtn) elTambahBtn.style.display = "none";
+    hasilNomor = "";
+
+    if (elStatus) {
+      elStatus.innerText = "⚡ Optimasi gambar & pemindaian...";
+      elStatus.style.color = "#2563eb";
+    }
+
+    try {
+      const processed = await preprocessImage(file);
+      if (elFoto) {
+        elFoto.src = processed.dataUrl;
+        elFoto.style.display = "block";
+      }
+
+      await prosesMultiEngine(processed.imgElement, processed.dataUrl);
+    } catch (e) {
+      console.error(e);
+      if (elStatus) {
+        elStatus.innerText = "❌ Gagal mengolah gambar.";
+        elStatus.style.color = "#dc2626";
+      }
+    }
+    
+    event.target.value = "";
   }
 
   async function prosesMultiEngine(imgElement, dataUrl) {
@@ -1194,8 +1183,30 @@
     if (elStatus) elStatus.innerText = "Daftar resi telah dibersihkan.";
   }
 
-  // --- INTEGRASI PENGIRIMAN DATA VIA JSONP (SERVER-FRIENDLY) ---
+  // --- CALLBACK JSONP GLOBAL ---
+  window.kirimResiCallback = function(response) {
+    const oldScript = document.getElementById("jsonpScript");
+    if (oldScript) oldScript.remove();
 
+    if (response && response.status === "success") {
+      alert("✅ " + response.message);
+      resi = [];
+      simpan();
+      tampilkan();
+      if (elStatus) {
+        elStatus.innerText = "✅ Data berhasil dikirim ke Google Sheets!";
+        elStatus.style.color = "#16a34a";
+      }
+    } else {
+      alert("❌ Gagal menyimpan data: " + (response ? response.message : "Error tidak diketahui"));
+      if (elStatus) {
+        elStatus.innerText = "❌ Gagal mengirim data.";
+        elStatus.style.color = "#dc2626";
+      }
+    }
+  };
+
+  // --- PROSES PENGIRIMAN DENGAN METODE JSONP TERUKUR ---
   function kirimSemua() {
     const namaPetugas = elPetugas ? elPetugas.value.trim() : "";
 
@@ -1225,55 +1236,29 @@
       resi: resi
     };
 
-    // Callback Unik
-    const uniqueCallback = "cb_" + Date.now();
+    // Bersihkan script JSONP lama jika ada
+    const oldScript = document.getElementById("jsonpScript");
+    if (oldScript) oldScript.remove();
 
-    window[uniqueCallback] = function(response) {
-      const scriptElem = document.getElementById(uniqueCallback);
-      if (scriptElem) scriptElem.remove();
-      delete window[uniqueCallback];
-
-      if (response && response.status === "success") {
-        alert("✅ " + response.message);
-        resi = [];
-        simpan();
-        tampilkan();
-
-        if (elStatus) {
-          elStatus.innerText = "✅ Data tersimpan di Google Sheets!";
-          elStatus.style.color = "#16a34a";
-        }
-      } else {
-        alert("❌ Gagal: " + (response ? response.message : "Kesalahan server"));
-        if (elStatus) {
-          elStatus.innerText = "❌ Kesalahan server.";
-          elStatus.style.color = "#dc2626";
-        }
-      }
-    };
-
-    // Injeksi Script Dinamis (JSONP)
-    const jsonString = encodeURIComponent(JSON.stringify(payload));
-    const fullUrl = `${APPS_SCRIPT_URL}?callback=${uniqueCallback}&data=${jsonString}`;
-
+    // Buat tag script dinamis (Standard JSONP Injection)
     const script = document.createElement("script");
-    script.id = uniqueCallback;
-    script.src = fullUrl;
+    script.id = "jsonpScript";
+    const dataString = encodeURIComponent(JSON.stringify(payload));
+    script.src = `${APPS_SCRIPT_URL}?callback=kirimResiCallback&data=${dataString}`;
 
+    // Tangani skenario jika terhalang error jaringan/CORS
     script.onerror = function() {
-      alert("❌ Terjadi kesalahan jaringan / koneksi ke Apps Script.");
       if (elStatus) {
-        elStatus.innerText = "❌ Kesalahan Koneksi.";
+        elStatus.innerText = "❌ Terjadi kesalahan jaringan / koneksi ke Apps Script.";
         elStatus.style.color = "#dc2626";
       }
-      script.remove();
-      delete window[uniqueCallback];
+      alert("❌ Terjadi kesalahan jaringan / koneksi ke Apps Script. Pastikan setelan 'Who has access' di Apps Script adalah 'Anyone'.");
     };
 
     document.body.appendChild(script);
   }
 
-  // Inisialisasi Tampilan Saat Halaman Dimuat
+  // Jalankan saat halaman selesai dimuat
   document.addEventListener("DOMContentLoaded", function() {
     tampilkan();
   });
