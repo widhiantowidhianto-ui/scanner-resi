@@ -1162,7 +1162,7 @@
     }
   };
 
-async function kirimSemua() {
+function kirimSemua() {
     const namaPetugas = elPetugas ? elPetugas.value.trim() : "";
 
     if (!namaPetugas) {
@@ -1179,12 +1179,11 @@ async function kirimSemua() {
     if (!confirm("🚀 Kirim " + resi.length + " resi sekarang?")) return;
 
     if (elStatus) {
-      elStatus.innerText = "⏳ Sedang mengirim data...";
+      elStatus.innerText = "⏳ Sedang mengirim data via Form...";
       elStatus.style.color = "#2563eb";
     }
 
     const batchId = namaPetugas.toUpperCase().substring(0, 3) + "-" + Date.now();
-    
     const payload = {
       petugas: namaPetugas,
       hub: "TANJUNGANOM 2 HUB",
@@ -1192,19 +1191,37 @@ async function kirimSemua() {
       resi: resi
     };
 
-    try {
-      // Mengirim langsung menggunakan fetch no-cors (Menembus Blokir GitHub & Wi-Fi)
-      await fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "text/plain"
-        },
-        body: JSON.stringify(payload)
-      });
+    // 1. Buat iframe tersembunyi agar halaman tidak merefresh saat submit
+    let iframe = document.getElementById("hidden_iframe");
+    if (!iframe) {
+      iframe = document.createElement("iframe");
+      iframe.name = "hidden_iframe";
+      iframe.id = "hidden_iframe";
+      iframe.style.display = "none";
+      document.body.appendChild(iframe);
+    }
 
-      // Berhasil!
-      alert("✅ Data berhasil dikirim ke Google Sheets!");
+    // 2. Buat Form HTML secara dinamis
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = APPS_SCRIPT_URL;
+    form.target = "hidden_iframe"; // Tembakkan hasil ke iframe tersembunyi
+
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "data";
+    input.value = JSON.stringify(payload);
+
+    form.appendChild(input);
+    document.body.appendChild(form);
+
+    // 3. Submit Form
+    form.submit();
+
+    // 4. Cleanup & Notifikasi
+    setTimeout(() => {
+      form.remove();
+      alert("✅ Data berhasil terkirim!");
       resi = [];
       if (typeof simpan === 'function') simpan();
       if (typeof tampilkan === 'function') tampilkan();
@@ -1213,15 +1230,7 @@ async function kirimSemua() {
         elStatus.innerText = "✅ Data tersimpan di Sheet!";
         elStatus.style.color = "#16a34a";
       }
-
-    } catch (err) {
-      console.error(err);
-      alert("❌ Pengiriman gagal. Cek koneksi internet/URL Apps Script.");
-      if (elStatus) {
-        elStatus.innerText = "❌ Kesalahan Koneksi.";
-        elStatus.style.color = "#dc2626";
-      }
-    }
+    }, 1500);
   }
 
   // Jalankan saat halaman siap
