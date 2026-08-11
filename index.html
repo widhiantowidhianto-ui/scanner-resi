@@ -914,7 +914,11 @@
   const APPS_SCRIPT_URL = "https://script.google.com/a/macros/spxexpress.com/s/AKfycbyYpMAA5vYpL_WPt_q4A2QZvQe7laW2B355tMJzBpnl5_gEe40uwqzMvgKs8ZvYBeHVZQ/exec";
   
   let hasilNomor = "";
-  let resi = [];
+  {
+  nomor: "SPXID123456789",
+  status: "pending",
+  waktu: Date.now()
+}
 
   // Proteksi parsing LocalStorage jika terjadi korupsi data
   try {
@@ -936,10 +940,31 @@
 
   if (elPetugas) {
     elPetugas.value = localStorage.getItem("scanner_petugas") || "";
-    elPetugas.addEventListener("input", function() {
-      localStorage.setItem("scanner_petugas", elPetugas.value);
-    });
-  }
+  const savedPetugas =
+  localStorage.getItem("scanner_petugas");
+
+if(savedPetugas && elPetugas){
+  elPetugas.value = savedPetugas;
+}
+
+elPetugas?.addEventListener("input", () => {
+  localStorage.setItem(
+    "scanner_petugas",
+    elPetugas.value.trim()
+  );
+});
+    elPetugas.addEventListener("input", () => {
+   localStorage.setItem(
+      "scanner_petugas",
+      elPetugas.value
+   );
+});
+    const lastPetugas =
+   localStorage.getItem("scanner_petugas");
+
+if(lastPetugas){
+   elPetugas.value = lastPetugas;
+}
 
   function tampilkan() {
     if (elJumlah) elJumlah.innerText = resi.length;
@@ -1172,20 +1197,23 @@
     }
   }
 
-  function tambahResi(nomor) {
-    nomor = String(nomor).toUpperCase().replace(/[^A-Z0-9]/g, "");
+  function tambahResi(nomor){
 
-    if (!nomor) return;
-
-    if (resi.includes(nomor)) {
-      alert("⚠️ Resi " + nomor + " sudah ada dalam daftar.");
-      return;
-    }
-
-    resi.unshift(nomor);
-    simpan();
-    tampilkan();
+  if(
+    resi.some(x => x.nomor === nomor)
+  ){
+    return;
   }
+
+  resi.push({
+    nomor,
+    status:"pending",
+    waktu:Date.now()
+  });
+
+  simpan();
+  tampilkan();
+}
 
   function hapusResi(index) {
     if (confirm("Hapus resi " + resi[index] + "?")) {
@@ -1197,9 +1225,27 @@
 
   function hapusSemua() {
   if (resi.length === 0) {
-    alert("Belum ada resi.");
+    alert("Belum ada data resi.");
     return;
   }
+
+  const yakin = confirm(
+    `Yakin ingin menghapus ${resi.length} resi?`
+  );
+
+  if (!yakin) return;
+
+  resi = [];
+
+  try {
+    simpan();
+    tampilkan();
+    alert("✅ Semua resi berhasil dihapus");
+  } catch (err) {
+    console.error(err);
+    alert("Gagal menghapus data");
+  }
+}
 
   if (!confirm("⚠️ Yakin ingin menghapus semua resi?")) {
     return;
@@ -1211,7 +1257,6 @@
 
   alert("✅ Semua resi berhasil dihapus.");
 }
-  
   // SINKRONISASI MULTI-HP / MULTI-PENGGUNA - V3
   // ============================================================
 
@@ -1219,7 +1264,7 @@
   let sinkronisasiTimer = null;
   const JSONP_TIMEOUT = 15000;
   const MAX_RETRY = 3;
-  const SYNC_INTERVAL = 30000;
+  const SYNC_INTERVAL = 60000;
 
   function setStatusKirim(text, color) {
     if (elStatus) {
@@ -1394,10 +1439,11 @@
           tampilkan();
 
         } catch (err) {
-          console.error("Gagal kirim", nomor, err);
-          gagalKirim.push({
-            nomor: nomor,
-            error: err.message
+          console.error(err);
+alert(
+  "Pengiriman gagal\n\n" +
+  (err.message || err)
+);
           });
         }
       }
@@ -1451,10 +1497,10 @@
 
     const namaPetugas = elPetugas ? elPetugas.value.trim() : "";
 
-    if (!namaPetugas) {
-      setSyncStatus("warn", "Nama petugas belum diisi", "Isi nama petugas untuk sinkronisasi.");
-      return;
-    }
+    if (namaPetugas.length < 3) {
+   alert("Nama petugas minimal 3 karakter");
+   return;
+}
 
     await prosesPengiriman(namaPetugas);
   }
@@ -1549,13 +1595,20 @@
   }
 
   window.addEventListener("online", () => {
-    setSyncStatus("busy", "Koneksi kembali", "Mencoba sinkronisasi data yang tertunda...");
-    sinkronisasiOtomatis();
-  });
+  setSyncStatus(
+    "success",
+    "Internet tersambung",
+    ""
+  );
+});
 
-  window.addEventListener("offline", () => {
-    setSyncStatus("warn", "Offline", "Data baru tetap tersimpan di HP dan akan dikirim saat online.");
-  });
+window.addEventListener("offline", () => {
+  setSyncStatus(
+    "warn",
+    "Internet terputus",
+    ""
+  );
+});
 
   // Jalankan saat halaman selesai dimuat
   document.addEventListener("DOMContentLoaded", function() {
@@ -1572,10 +1625,13 @@
   // Registrasi service worker agar aplikasi bisa dipasang di HP.
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", function() {
-      navigator.serviceWorker.register("sw_spx.js").catch(function(err) {
-        console.log("Service Worker tidak aktif:", err);
-      });
-    });
+      if(
+  "serviceWorker" in navigator
+){
+  navigator.serviceWorker
+    .register("./sw_spx.js")
+    .catch(console.error);
+}
   }
 
 </script>
