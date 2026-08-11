@@ -1196,8 +1196,22 @@
   }
 
   function hapusSemua() {
-    if (resi.length === 0) return;
-    if (!confirm("⚠️ Yakin ingin   // ============================================================
+  if (resi.length === 0) {
+    alert("Belum ada resi.");
+    return;
+  }
+
+  if (!confirm("⚠️ Yakin ingin menghapus semua resi?")) {
+    return;
+  }
+
+  resi = [];
+  simpan();
+  tampilkan();
+
+  alert("✅ Semua resi berhasil dihapus.");
+}
+  
   // SINKRONISASI MULTI-HP / MULTI-PENGGUNA - V3
   // ============================================================
 
